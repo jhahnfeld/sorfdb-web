@@ -12,7 +12,7 @@ import {
 import Pagination from "@/components/pagination/Pagination.vue";
 import type { BakrepSearchResultEntry } from "@/model/BakrepSearchResult";
 import type { SortOption, SortDirection } from "@/model/Search";
-import ResultTable from "@/views/search/ResultTable.vue";
+import ResultTable from "@/views/browse/ResultTable.vue";
 import { computed, onMounted, ref, type Ref } from "vue";
 const searchState = usePageState();
 const entries: Ref<BakrepSearchResultEntry[]> = ref([]);

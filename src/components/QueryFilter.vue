@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FilterTuple } from "@/views/BrowseView.vue";
+import type { FilterTuple } from "@/views/SearchView.vue";
 import { computed, type PropType } from "vue";
 
 const props = defineProps({
