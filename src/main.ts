@@ -16,7 +16,7 @@ fetch("/config/config.json")
     return r.json();
   })
   .then((config) => {
-    initApi(config["bakrep-api-url"]);
+    initApi(config["sorfdb-api-url"]);
     initDbxrefApi(config["dbxref-api-url"]);
     const app = createApp(App);
     app.use(router);
