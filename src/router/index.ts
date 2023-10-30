@@ -11,17 +11,34 @@ const router = createRouter({
       component: () => import("../views/HomeView.vue"),
     },
     {
-      path: "/about",
-      name: "about",
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import("../views/AboutView.vue"),
-    },
-    {
       path: "/search",
       name: "search",
-      component: () => import("../views/search/SearchView.vue"),
+      component: () =>  import("../views/SearchView.vue"),
+    },
+    {
+      path: "/browse",
+      name: "browse",
+      component: () => import("../views/browse/BrowseView.vue"),
+    },
+    {
+      path: "/download",
+      name: "download",
+      component: () => import("../views/DownloadView.vue"),
+    },
+    {
+      path: "/documentation",
+      name: "documentation",
+      component: () => import("../views/DokuView.vue"),
+    },
+    {
+      path: "/faq",
+      name: "faq",
+      component: () => import("../views/FaqView.vue"),
+    },
+    {
+      path: "/about",
+      name: "about",
+      component: () => import("../views/AboutView.vue"),
     },
     {
       path: "/imprint",
@@ -35,14 +52,14 @@ const router = createRouter({
       props: true,
     },
     {
-      path: "/browse",
-      name: "browse",
-      component: () => import("../views/BrowseView.vue"),
-    },
-    {
       path: "/composition",
       name: "composition",
       component: () => import("../views/DatasetCompositionView.vue"),
+    },
+    {
+      path: "/:catchAll(.*)",
+      name: "Lost",
+      component: () => import("../views/NotFoundView.vue"),
     },
   ],
 });
