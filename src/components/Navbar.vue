@@ -2,9 +2,11 @@
 import { ref } from "vue";
 const items = ref([
   { href: { name: "home" }, text: "Home" },
-  { href: { name: "browse" }, text: "Browse" },
   { href: { name: "search" }, text: "Search" },
-  { href: { name: "composition" }, text: "Species composition" },
+  { href: { name: "browse" }, text: "Browse" },
+  { href: { name: "download" }, text: "Download" },
+  { href: { name: "documentation" }, text: "Documentation" },
+  { href: { name: "faq" }, text: "FAQ" },
   { href: { name: "about" }, text: "About" },
 ]);
 </script>
@@ -14,7 +16,7 @@ const items = ref([
     class="navbar navbar-expand-lg navbar-light fixed-top bg-light navbar-scroll"
   >
     <div class="container-fluid">
-      <router-link class="navbar-brand" to="/">BakRep Web</router-link>
+      <router-link class="navbar-brand" to="/" style="font-weight: bold;">sORFdb</router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -35,12 +37,11 @@ const items = ref([
           </template>
         </ul>
         <ul class="navbar-nav">
-          <!-- <li><a class="nav-link " href="https://www.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000685">Citation</a></li> -->
           <li>
             <a
               style="font-size: 2em"
               class="nav-link"
-              href="https://github.com/ag-computational-bio/bakrep-web"
+              href="https://github.com/jhahnfeld"
               target="_blank"
               ><i class="bi bi-github text-dark"></i
             ></a>
