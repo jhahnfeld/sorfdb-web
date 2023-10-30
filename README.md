@@ -1,6 +1,6 @@
-# bakrep-web
+# sorfdb-web
 
-Website for the bakterial genome repositry bakrep.
+Website for the bakterial sORF and small protein database sORFdb.
 
 ## Recommended IDE Setup
 
