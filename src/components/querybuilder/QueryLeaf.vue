@@ -74,7 +74,6 @@
 import { isRange, type LeafQuery, type Query } from "@/model/Search";
 import { type PropType, computed, type Ref } from "vue";
 import type { LeafRule, QueryBuilderOptions, Rule } from "./Rule";
-import { isNumber } from "chart.js/helpers";
 import RangeInput from "./input/RangeInput.vue";
 
 const props = defineProps({
@@ -117,7 +116,7 @@ function updateOp(evt: Event) {
     if (rule.value) {
       const op = rule.value.ops[idx];
       if (rule.value.type === "number") {
-        if (op.label === "[]" && isNumber(newQuery.value)) {
+        if (op.label === "[]") {
           newQuery.value = props.options.defaultValue(rule.value, op);
         } else if (op.label != "[]" && isRange(newQuery.value)) {
           newQuery.value = props.options.defaultValue(rule.value, op);
