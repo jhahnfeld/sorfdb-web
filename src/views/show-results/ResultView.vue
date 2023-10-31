@@ -14,7 +14,6 @@ import type { GtdbtkResult } from "@/model/GtdbtkResult";
 import type { MlstResult } from "@/model/MlstResults";
 import router from "@/router";
 import { useRoute } from "vue-router";
-import BaktaAnnotationTable from "./bakta/BaktaAnnotationTable.vue";
 import BaktaGenomeViewer from "./bakta/BaktaGenomeViewer.vue";
 import SummaryPane from "@/views/show-results/SummaryPane.vue";
 import type { Metadata } from "@/model/Metadata";
@@ -85,9 +84,6 @@ state.value.setState(State.Loading);
       >
         <template v-if="active_tab === 'genome-viewer'">
           <BaktaGenomeViewer :data="baktaResult" />
-        </template>
-        <template v-if="active_tab === 'annotation-table'">
-          <BaktaAnnotationTable :data="baktaResult" />
         </template>
         <template
           v-if="
