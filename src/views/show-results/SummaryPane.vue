@@ -6,10 +6,8 @@ import type { MlstResult } from "@/model/MlstResults";
 import type { PropType } from "vue";
 
 import BaktaStats from "@/views/show-results/bakta/BaktaStats.vue";
-import DisplayAssembly from "@/views/show-results/DisplayAssembly.vue";
 import GtdbtkTaxonomy from "@/views/show-results/GtdbtkTaxonomy.vue";
 import PhylogenyTree from "@/components/PhylogenyTree.vue";
-import ContigBar from "@/components/ContigBar.vue";
 
 const props = defineProps({
   id: { type: String },
@@ -30,14 +28,6 @@ const props = defineProps({
     </div>
     <div class="col-lg-4 col-md-12">
       <div class="card h-100">
-        <div class="card-header">Assembly</div>
-        <div class="card-body">
-          <DisplayAssembly :checkm="checkm" :bakta="bakta" />
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-12">
-      <div class="card h-100">
         <div class="card-header">Phylogeny</div>
         <div class="card-body">
           <PhylogenyTree :gtdb="gtdbtk" />
@@ -53,16 +43,6 @@ const props = defineProps({
           <GtdbtkTaxonomy :gtdb="gtdbtk" :mlst="mlst" :bakta="bakta" />
         </div>
       </div>
-    </div>
-  </div>
-  <div class="row gx-2 gy-2">
-    <div class="col-12">
-      <h5>Contigs:</h5>
-      <ContigBar
-        :sequences="bakta.sequences"
-        :length="bakta.stats.size"
-        :n50="bakta.stats.n50"
-      />
     </div>
   </div>
   <div class="row gx-2 gy-2 pt-4">
