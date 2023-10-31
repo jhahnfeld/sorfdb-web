@@ -14,7 +14,6 @@ import type { GtdbtkResult } from "@/model/GtdbtkResult";
 import type { MlstResult } from "@/model/MlstResults";
 import router from "@/router";
 import { useRoute } from "vue-router";
-import BaktaGenomeViewer from "./bakta/BaktaGenomeViewer.vue";
 import SummaryPane from "@/views/show-results/SummaryPane.vue";
 import type { Metadata } from "@/model/Metadata";
 import MetadataCard from "./metadata/MetadataCard.vue";
@@ -82,9 +81,6 @@ state.value.setState(State.Loading);
         :activeItem="active_tab"
         @update:value="(newValue) => updateTab(newValue)"
       >
-        <template v-if="active_tab === 'genome-viewer'">
-          <BaktaGenomeViewer :data="baktaResult" />
-        </template>
         <template
           v-if="
             active_tab == 'summary' &&
