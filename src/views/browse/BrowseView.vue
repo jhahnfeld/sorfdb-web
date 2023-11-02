@@ -35,6 +35,10 @@ import {
 import ExportProgress from "./ExportProgress.vue";
 import { downloadFullTsv, type ProgressEvent } from "./ExportTsv";
 import ResultTable from "./ResultTable.vue";
+import { type Option } from "@/components/CheckboxOption";
+import CheckboxSelection from "@/components/CheckboxSelectionWithVModel.vue";
+import CheckboxDropdown from "@/components/DropdownCheckbox.vue";
+
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<BakrepSearchResultEntry[]> = ref([]);
@@ -44,6 +48,63 @@ const pagination: Ref<PaginationData> = ref(empty());
 const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
 const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
+
+const selectedColumns = ref<Option[]>([
+  { label: "sORF ID", key: "id" },
+  { label: "Species", key: "species" },
+  { label: "sORF length", key: "slen" },
+  { label: "Start codon", key: "start-codon" },
+  { label: "Protein length", key: "plen" },
+  { label: "Product", key: "product" },
+  { label: "Ribosomal binding site", key: "rbs" },
+  { label: "Pfam hits", key: "pfam-hits" },
+  { label: "Gravy", key: "gravy" },
+  { label: "Aromaticity", key: "aromaticity" },
+  { label: "Molecular weight", key: "molecular-weight" },
+  { label: "Instability", key: "instability" },
+  { label: "Isoelectric point", key: "isoelectric-point" },
+  { label: "Aliphatic-index", key: "aliphatic-index" },
+  { label: "Boman", key: "boman" },
+]);
+const defaultSelectedColumns: Option[] = selectedColumns.value;
+const columnIDs: Option[] = [
+  { label: "sORF ID", key: "id" },
+  { label: "Source database", key: "source" },
+  { label: "GenBank Assembly", key: "assembly" },
+  { label: "GenBank/SmProt Accession", key: "accession" },
+  { label: "GenBank/SmProt Protein ID", key: "protein-id" },
+  { label: "UniProtKB/Swiss-Prot UID", key: "uid" },
+  { label: "UniProtKB/Swiss-Prot entry name", key: "entry-name" },
+];
+const columnTaxonomy: Option[] = [
+  { label: "Phylum", key: "phylum" },
+  { label: "Class", key: "class" },
+  { label: "Order", key: "order" },
+  { label: "Family", key: "family" },
+  { label: "Genus", key: "genus" },
+  { label: "Species", key: "species" },
+  { label: "Strain", key: "strain" },
+];
+const columnSequenceFeatures: Option[] = [
+  { label: "sORF", key: "sorf" },
+  { label: "sORF length", key: "slen" },
+  { label: "Start codon", key: "start-codon" },
+  { label: "Protein", key: "protein" },
+  { label: "Protein length", key: "plen" },
+  { label: "Product", key: "product" },
+  { label: "Ribosomal binding site", key: "rbs" },
+];
+const columnDescriptors: Option[] = [
+  { label: "Pfam hits", key: "pfam-hits" },
+  { label: "Gravy", key: "gravy" },
+  { label: "Aromaticity", key: "aromaticity" },
+  { label: "Molecular weight", key: "molecular-weight" },
+  { label: "Instability", key: "instability" },
+  { label: "Isoelectric point", key: "isoelectric-point" },
+  { label: "Aliphatic-index", key: "aliphatic-index" },
+  { label: "Boman", key: "boman" },
+];
+
 function init() {
   pageState.value.setState(State.Loading);
   api
@@ -82,25 +143,35 @@ const rules: Ref<Rule[]> = computed(() => {
 });
 
 const fieldNames: Record<string, string> = {
-  id: "Dataset id",
-  "bakta.stats.size": "Assembly size",
-  "bakta.stats.no_sequences": "Number of contigs",
-  "bakta.stats.gc": "GC content",
-  "bakta.stats.n_ratio": "N ratio",
-  "bakta.stats.n50": "N50",
-  "bakta.stats.coding_ratio": "Coding ratio",
-  "bakta.genome.strain": "Strain",
-  "gtdbtk.classification.domain": "Domain",
-  "gtdbtk.classification.phylum": "Phylum",
-  "gtdbtk.classification.class": "Class",
-  "gtdbtk.classification.order": "Order",
-  "gtdbtk.classification.family": "Family",
-  "gtdbtk.classification.genus": "Genus",
-  "gtdbtk.classification.species": "Species",
-  "mlst.sequence_type": "MLST Sequence type",
-  "checkm2.quality.completeness": "Completeness",
-  "checkm2.quality.contamination": "Contamination",
-  "bakta.features": "Annotated features",
+  id: "sORF ID",
+  source: "Source database",
+  assembly: "GenBank Assembly",
+  accession: "GenBank/SmProt Accession",
+  "protein-id": "GenBank/SmProt Protein ID",
+  uid: "UniProtKB/Swiss-Prot UID",
+  "entry-name": "UniProtKB/Swiss-Prot entry name",
+  phylum: "Phylum",
+  class: "Class",
+  order: "Order",
+  family: "Family",
+  genus: "Genus",
+  species: "Species",
+  strain: "Strain",
+  sorf: "sORF",
+  slen: "sORF length",
+  "start-codon": "Start codon",
+  protein: "Protein",
+  plen: "Protein length",
+  product: "Product",
+  rbs: "Ribosomal binding site",
+  "pfam-hits": "Pfam hits",
+  gravy: "Gravy",
+  aromaticity: "Aromaticity",
+  "molecular-weight": "Molecular weight",
+  instability: "Instability",
+  "isoelectric-point": "Isoelectric point",
+  "aliphatic-index": "Aliphatic-index",
+  boman: "Boman",
 };
 
 function search(offset = 0) {
@@ -120,6 +191,14 @@ function search(offset = 0) {
       pagination.value.total = r.total;
     })
     .catch((err) => pageState.value.setError(err));
+}
+
+function clearSelection() {
+  selectedColumns.value = [];
+}
+
+function resetSelection() {
+  selectedColumns.value = defaultSelectedColumns;
 }
 
 const positionInResults: Ref<PositionInResult> = computed(() =>
@@ -185,6 +264,7 @@ onBeforeUnmount(() => {
   <main class="container pt-5">
     <Loading :state="pageState">
       <div class="row">
+        <h2>Browse</h2>
         <div class="col-12">
           <QueryBuilder v-model:query="query" :rules="rules" @submit="search" />
         </div>
@@ -195,7 +275,7 @@ onBeforeUnmount(() => {
           <div class="d-flex mt-2 mb-5 justify-content-end">
             <button
               @click="search(0)"
-              class="btn btn-secondary"
+              class="btn btn-primary"
               type="button"
               id="button-search"
               :disabled="exportInProgress"
@@ -203,6 +283,56 @@ onBeforeUnmount(() => {
               Search
             </button>
           </div>
+        </div>
+
+        <div class="btn-group">
+          <CheckboxDropdown title="Show IDs">
+            <CheckboxSelection v-model="selectedColumns" :options="columnIDs" />
+          </CheckboxDropdown>
+          <CheckboxDropdown title="Show taxonomy">
+            <CheckboxSelection
+              v-model="selectedColumns"
+              :options="columnTaxonomy"
+            />
+          </CheckboxDropdown>
+          <CheckboxDropdown title="Show sequence features">
+            <CheckboxSelection
+              v-model="selectedColumns"
+              :options="columnSequenceFeatures"
+            />
+          </CheckboxDropdown>
+          <CheckboxDropdown title="Show protein descriptors">
+            <CheckboxSelection
+              v-model="selectedColumns"
+              :options="columnDescriptors"
+            />
+          </CheckboxDropdown>
+          <div class="px-2">
+            <button
+              @click="clearSelection()"
+              class="btn btn-secondary"
+              type="button"
+              id="button-search"
+            >
+              Clear
+            </button>
+          </div>
+          <div class="px-2">
+            <button
+              @click="resetSelection()"
+              class="btn btn-secondary"
+              type="button"
+              id="button-search"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <li v-for="item in selectedColumns" :key="item.key">
+            {{ item }}
+          </li>
         </div>
       </div>
       <Loading :state="searchState">
