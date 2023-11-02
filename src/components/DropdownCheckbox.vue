@@ -9,7 +9,7 @@
     >
       {{ title }}
     </button>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu px-2">
       <slot></slot>
     </div>
   </div>
