@@ -9,15 +9,17 @@ const dna_alphabet: Set<string> = new Set([
 ]);
 
 const protein_alphabet: Set<string> = new Set([
-    ...iupac_protein,
-    ...iupac_protein.map((x) => x.toUpperCase()),
-  ]);
+  ...iupac_protein,
+  ...iupac_protein.map((x) => x.toUpperCase()),
+]);
 
 function matchesAlphabet(seq: string, alphabet: Set<string>): boolean {
   for (let i = 0; i < seq.length; i++) {
     const char: string = seq[i];
     if (!alphabet.has(char)) {
-      console.log(`Invalid dna character '${char}' at position '${i}' in sequence '${seq}'`)
+      console.log(
+        `Invalid dna character '${char}' at position '${i}' in sequence '${seq}'`,
+      );
       return false;
     }
   }
@@ -25,10 +27,15 @@ function matchesAlphabet(seq: string, alphabet: Set<string>): boolean {
 }
 
 function matchesIdScheme(sequence: string): boolean {
-  if (sequence.startsWith('GenBank|') || sequence.startsWith('SwissProt|') || sequence.startsWith('UniProt|') || sequence.startsWith('SmProt|')){
-    return true
+  if (
+    sequence.startsWith("GenBank|") ||
+    sequence.startsWith("SwissProt|") ||
+    sequence.startsWith("UniProt|") ||
+    sequence.startsWith("SmProt|")
+  ) {
+    return true;
   } else {
-    return false
+    return false;
   }
   // return idRegex.test(sequence)
 }
@@ -45,37 +52,48 @@ function validateProteinSequences(entries: Array<string>) {
   return entries.map((x) => validateProtein(x));
 }
 
+function validateDnaSequences(entries: Array<string>) {
+  return entries.map((x) => validateDNA(x));
+}
+
 interface GuessedType {
-  'valid': boolean;
-  'type': string;
+  valid: boolean;
+  type: string;
 }
 
 function guessInputType(sequence: string): GuessedType {
   const isProtein: boolean = validateProtein(sequence);
   const isDNA: boolean = validateDNA(sequence);
-  const isID: boolean = matchesIdScheme(sequence)
+  const isID: boolean = matchesIdScheme(sequence);
 
   if (isDNA) {
     return {
-      'valid': true,
-      'type': 'dna'
-    }
+      valid: true,
+      type: "dna",
+    };
   } else if (isProtein) {
     return {
-      'valid': true,
-      'type': 'protein'
-    }
+      valid: true,
+      type: "protein",
+    };
   } else if (isID) {
     return {
-      'valid': true,
-      'type': 'id'
-    }
+      valid: true,
+      type: "id",
+    };
   } else {
     return {
-      'valid': false,
-      'type': 'invalid'
-    }
+      valid: false,
+      type: "invalid",
+    };
   }
 }
 
-export { guessInputType, validateProtein, validateDNA, matchesIdScheme };
+export {
+  guessInputType,
+  validateProtein,
+  validateDNA,
+  matchesIdScheme,
+  validateProteinSequences,
+  validateDnaSequences,
+};
