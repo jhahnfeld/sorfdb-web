@@ -47,72 +47,74 @@ const contaminationTuple = ref<FilterTuple>({ from: 0, to: 100 });
 const error = ref("");
 const sequence = ref("");
 const sequenceLength = ref(sequence.value.length);
+const sequenceFile = ref(null);
 const inputType = ref("auto");
 const searchType = ref("exact");
 const identity = ref(90);
 const coverage = ref(80);
 const submitting = ref(false);
-const seqValid = ref(false);
+const validSequence = ref(false);
+const validSequenceFile = ref(false);
 const valid = ref(false);
 
 watch(sequence, (newSequence) => {
   sequenceLength.value = newSequence.length;
   if (newSequence.length == 0) {
-    seqValid.value = false;
+    validSequence.value = false;
     error.value = "";
   } else if (inputType.value == "auto") {
     let guessedType = guessInputType(newSequence);
     if (guessedType.valid) {
       inputType.value = guessedType.type;
-      seqValid.value = true;
+      validSequence.value = true;
       error.value = "";
     } else {
-      seqValid.value = false;
+      validSequence.value = false;
       error.value = "Could not guess input type.";
     }
   } else if (inputType.value == "protein" && validateProtein(newSequence)) {
-    seqValid.value = true;
+    validSequence.value = true;
     error.value = "";
   } else if (inputType.value == "dna" && validateDNA(newSequence)) {
-    seqValid.value = true;
+    validSequence.value = true;
     error.value = "";
   } else if (inputType.value == "id" && matchesIdScheme(newSequence)) {
-    seqValid.value = true;
+    validSequence.value = true;
     error.value = "";
   } else {
-    seqValid.value = false;
+    validSequence.value = false;
     error.value = `Could not match input with type: ${inputType.value}`;
   }
 });
 watch(inputType, (newInputType) => {
   if (sequence.value.length == 0) {
-    seqValid.value = false;
+    validSequence.value = false;
     error.value = "";
   } else if (newInputType == "auto") {
     let guessedType = guessInputType(sequence.value);
     if (guessedType.valid) {
       inputType.value = guessedType.type;
-      seqValid.value = true;
+      validSequence.value = true;
       error.value = "";
     } else {
-      seqValid.value = false;
+      validSequence.value = false;
       error.value = "Could not guess input type.";
     }
   } else if (newInputType == "protein" && validateProtein(sequence.value)) {
-    seqValid.value = true;
+    validSequence.value = true;
     error.value = "";
   } else if (newInputType == "dna" && validateDNA(sequence.value)) {
-    seqValid.value = true;
+    validSequence.value = true;
     error.value = "";
   } else if (newInputType == "id" && matchesIdScheme(sequence.value)) {
-    seqValid.value = true;
+    validSequence.value = true;
     error.value = "";
   } else {
-    seqValid.value = false;
+    validSequence.value = false;
     error.value = `Could not match input with type: ${inputType.value}`;
   }
 });
-watch(seqValid, (v) => {
+watch(validSequence, (v) => {
   if (v) {
     valid.value = true;
     error.value = "";
@@ -303,7 +305,7 @@ onMounted(filter);
               id="searchType"
               checked
             />
-            Exact
+            Exact (fast)
           </label>
           <label class="form-check-label" for="inputTypeProtein">
             <input
