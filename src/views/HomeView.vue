@@ -7,7 +7,7 @@
         sORFdb
         <span class="float-end version" style="font-size: 0.3em; color: gray; padding-right: 1.5em;"> (DB: v0.1) </span>
       </h1>
-      <h3 style="text-align: left; color: gray;">
+      <h3 style="text-align: left; color: gray">
         A database for small proteins  &amp; sORFs in bacteria
       </h3>
     </div>
@@ -73,7 +73,7 @@
         The browse function provides a viewer for all database entries. The entries can be filtered using criteria such as taxonomy, sequence length and protein descriptors.
         <br>
         If you want to know more about the usage of the search and browse functions look here: <router-link to="/about">Documentation</router-link><br>
-        Some of your questions might also be answered in the: <router-link to="/about">FAQ</router-link>.      
+        Some of your questions might also be answered in the <router-link to="/about">FAQ</router-link>.      
       </p>
   </main>
 </template>
