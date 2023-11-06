@@ -41,7 +41,7 @@ const items = ref([
             <a
               style="font-size: 2em"
               class="nav-link"
-              href="https://github.com/jhahnfeld"
+              href="https://github.com/jhahnfeld/sorfdb-web"
               target="_blank"
               ><i class="bi bi-github text-dark"></i
             ></a>
