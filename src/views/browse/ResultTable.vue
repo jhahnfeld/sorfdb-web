@@ -51,6 +51,12 @@ function extractValue(entry: SorfdbEntry, c: Option) {
           scope="row"
         >
           {{ c.label }}
+          <SortSymbol
+            v-if="c.sortable"
+            :sortkey="c.key"
+            :ordering="ordering"
+            @update:ordering="passOrdering"
+          />
         </th>
       </tr>
     </thead>

@@ -38,6 +38,7 @@ import ResultTable from "./ResultTable.vue";
 import { type Option } from "@/components/CheckboxOption";
 import CheckboxSelection from "@/components/CheckboxSelectionWithVModel.vue";
 import CheckboxDropdown from "@/components/DropdownCheckbox.vue";
+import { a } from "node_modules/@storybook/vue3/dist/render-ddbe18a8";
 
 const pageState = usePageState();
 const searchState = usePageState();
@@ -109,6 +110,31 @@ const allColumns = ref<Option[]>([
   { group: "Protein&nbsp;descriptors", label: "Boman", key: "boman" },
 ]);
 
+function updateAllColumns(info: SearchInfo) {
+  const index = allColumns.value.reduce(
+    (a, v) => {
+      a[v.key] = v;
+      return a;
+    },
+    {} as Record<string, Option>,
+  );
+
+  for (const f of info.fields) {
+    const o = index[f.field];
+    if (o) {
+      o.sortable = "sortable" in f ? f.sortable : false;
+    }
+  }
+}
+
+const fieldNames = computed(() => {
+  const out: Record<string, string> = {};
+  for (const col of allColumns.value) {
+    out[col.key] = col.label;
+  }
+  return out;
+});
+
 const defaultColumns = [
   "id",
   "species",
@@ -154,16 +180,19 @@ function init() {
     .searchinfo()
     .then((r) => {
       searchinfo.value = r;
+      updateAllColumns(r);
       pageState.value.setState(State.Main);
     })
     .catch((err) => pageState.value.setError(err));
 }
 
 function searchinfo2querybuilderrules(f: SearchInfoField): Rule {
+  const label =
+    f.field in fieldNames.value ? fieldNames.value[f.field] : f.field;
   if (f.type === "nested") {
     const nestedRule: NestedRule = {
       field: f.field,
-      label: f.field in fieldNames ? fieldNames[f.field] : f.field,
+      label: label,
       type: "nested",
       rules: f.fields.map(searchinfo2querybuilderrules),
     };
@@ -171,7 +200,7 @@ function searchinfo2querybuilderrules(f: SearchInfoField): Rule {
   } else {
     const leafRule: LeafRule = {
       field: f.field,
-      label: f.field in fieldNames ? fieldNames[f.field] : f.field,
+      label: label,
       type: f.type as "number" | "text",
       ops: f.ops.map((o) => ({ label: o, description: o })),
     };
@@ -184,38 +213,6 @@ const rules: Ref<Rule[]> = computed(() => {
   out = searchinfo.value.fields.map(searchinfo2querybuilderrules);
   return out;
 });
-
-const fieldNames: Record<string, string> = {
-  id: "sORF ID",
-  source: "Source database",
-  assembly: "GenBank Assembly",
-  accession: "GenBank/SmProt Accession",
-  "protein-id": "GenBank/SmProt Protein ID",
-  uid: "UniProtKB/Swiss-Prot UID",
-  "entry-name": "UniProtKB/Swiss-Prot entry name",
-  phylum: "Phylum",
-  class: "Class",
-  order: "Order",
-  family: "Family",
-  genus: "Genus",
-  species: "Species",
-  strain: "Strain",
-  sorf: "sORF",
-  slen: "sORF length",
-  "start-codon": "Start codon",
-  protein: "Protein",
-  plen: "Protein length",
-  product: "Product",
-  rbs: "Ribosomal binding site",
-  "pfam-hits": "Pfam hits",
-  gravy: "Gravy",
-  aromaticity: "Aromaticity",
-  "molecular-weight": "Molecular weight",
-  instability: "Instability",
-  "isoelectric-point": "Isoelectric point",
-  "aliphatic-index": "Aliphatic-index",
-  boman: "Boman",
-};
 
 function search(offset = 0) {
   searchState.value.setState(State.Loading);
