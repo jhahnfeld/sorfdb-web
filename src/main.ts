@@ -5,7 +5,7 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./assets/main.css";
-import { initApi } from "./BakrepApi";
+import { initApi } from "./SorfdbApi";
 import { initDbxrefApi } from "./DbxrefApi";
 
 fetch("/config/config.json")

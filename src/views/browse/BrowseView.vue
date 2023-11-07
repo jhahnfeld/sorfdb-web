@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useApi } from "@/BakrepApi";
+import { useApi } from "@/SorfdbApi";
 import usePageState, { State } from "@/PageState";
 import Loading from "@/components/Loading.vue";
 import {
@@ -15,7 +15,7 @@ import type {
   NestedRule,
   Rule,
 } from "@/components/querybuilder/Rule";
-import type { BakrepSearchResultEntry } from "@/model/BakrepSearchResult";
+import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 import type {
   CompoundQuery,
   SearchInfo,
@@ -41,7 +41,7 @@ import CheckboxDropdown from "@/components/DropdownCheckbox.vue";
 
 const pageState = usePageState();
 const searchState = usePageState();
-const entries: Ref<BakrepSearchResultEntry[]> = ref([]);
+const entries: Ref<SorfdbEntry[]> = ref([]);
 
 const api = useApi();
 const pagination: Ref<PaginationData> = ref(empty());
@@ -366,7 +366,9 @@ onBeforeUnmount(() => {
               :ordering="ordering"
               :entries="entries"
               @update:ordering="updateOrdering"
+              :visible-columns="[]"
             />
+            <!-- TODO replace placeholder array with real visible columns-->
           </div>
           <Pagination
             v-if="pagination.total > 0"
@@ -381,3 +383,4 @@ onBeforeUnmount(() => {
 </template>
 
 <style></style>
+@/SorfdbApi @/model/SorfdbSearchResult

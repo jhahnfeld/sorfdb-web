@@ -1,4 +1,4 @@
-import { type BakrepApi } from "@/BakrepApi";
+import { type SorfdbApi } from "@/SorfdbApi";
 import type { Query, SearchAfter, SortOption } from "@/model/Search";
 
 /**
@@ -13,7 +13,7 @@ import type { Query, SearchAfter, SortOption } from "@/model/Search";
  * @param handler
  */
 export function downloadFullTsv(
-  api: BakrepApi,
+  api: SorfdbApi,
   req: ExportRequest,
   handler: ExportHandler,
 ): AbortController {

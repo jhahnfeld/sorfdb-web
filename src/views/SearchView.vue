@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useApi } from "@/BakrepApi";
+import { useApi } from "@/SorfdbApi";
 import usePageState, { State } from "@/PageState";
 import Loading from "@/components/Loading.vue";
 import QueryFilter from "@/components/QueryFilter.vue";
@@ -10,7 +10,10 @@ import {
   type PositionInResult,
 } from "@/components/pagination/Pagination";
 import Pagination from "@/components/pagination/Pagination.vue";
-import type { BakrepSearchResultEntry } from "@/model/BakrepSearchResult";
+import type {
+  SorfdbSearchResult,
+  SorfdbEntry,
+} from "@/model/SorfdbSearchResult";
 import type { SortOption, SortDirection } from "@/model/Search";
 import ExportProgress from "./browse/ExportProgress.vue";
 import { downloadFullTsv, type ProgressEvent } from "./browse/ExportTsv";
@@ -29,7 +32,7 @@ import {
 } from "../search-validator";
 
 const searchState = usePageState();
-const entries: Ref<BakrepSearchResultEntry[]> = ref([]);
+const entries: Ref<SorfdbEntry[]> = ref([]);
 const api = useApi();
 const pagination: Ref<PaginationData> = ref(empty());
 
@@ -381,7 +384,10 @@ onMounted(filter);
           :ordering="ordering"
           :entries="entries"
           @update:ordering="updateOrdering"
+          :visible-columns="[]"
         />
+        <!-- TODO replace placeholder array with real visible columns-->
+
         <Pagination class="mt-3" :value="pagination" @update:offset="filter" />
       </div>
     </Loading>
@@ -393,3 +399,4 @@ label + label {
   margin-left: 10px;
 }
 </style>
+@/SorfdbApi @/model/SorfdbSearchResult
