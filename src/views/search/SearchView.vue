@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import {
-  toPosition,
-  type PaginationData,
-  type PositionInResult,
-} from "@/components/pagination/Pagination";
-import type { CompoundQuery, SortDirection, SortOption } from "@/model/Search";
+import { type PaginationData } from "@/components/pagination/Pagination";
+import type {
+  CompoundQuery,
+  SearchInfo,
+  SortDirection,
+  SortOption,
+} from "@/model/Search";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
-import usePageState from "@/PageState";
+import usePageState, { State } from "@/PageState";
 import { useApi } from "@/SorfdbApi";
-import { shallowRef } from "vue";
+import { onMounted, shallowRef, unref } from "vue";
 
-import { computed, ref, type Ref } from "vue";
+import type { Option } from "@/components/CheckboxOption";
+import { ref, type Ref } from "vue";
+import { resultTableColums } from "../browse/ResultColumns";
+import ResultsPanel from "../browse/ResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
 import SequenceSelectionPanel from "./SequenceSelectionPanel.vue";
-import { resultTableColums } from "../browse/ResultColumns";
-import type { Option } from "@/components/CheckboxOption";
-import ResultsPanel from "../browse/ResultsPanel.vue";
-
+const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
 const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
@@ -27,10 +28,7 @@ const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const exportInProgress = ref(false);
 
 const allColumns = ref<Option[]>(resultTableColums());
-
-const positionInResults: Ref<PositionInResult> = computed(() =>
-  toPosition(pagination.value),
-);
+const resultsPanel = ref<typeof ResultsPanel>();
 
 function updateOrdering(sortkey: string, direction: SortDirection | null) {
   const idx = ordering.value.findIndex((s) => s.field === sortkey);
@@ -43,28 +41,74 @@ function updateOrdering(sortkey: string, direction: SortDirection | null) {
   }
   search();
 }
-function search(offset = 0) {}
-// function updateOrdering(sortkey: string, direction: SortDirection | null) {
-//   const idx = ordering.value.findIndex((s) => s.field === sortkey);
-//   if (direction == null) {
-//     if (idx > -1) ordering.value.splice(idx, 1);
-//   } else {
-//     if (idx > -1) ordering.value[idx].ord = direction;
-//     else
-//       ordering.value = [{ field: sortkey, ord: direction }, ...ordering.value];
-//   }
-//   filter();
-// }
-
-// onMounted(filter);
-function _search(req: SequenceSearchRequest) {
-  console.log(req);
+function search(offset = 0) {
+  searchState.value.setState(State.Loading);
+  if (resultsPanel.value) resultsPanel.value.resetTsvExport();
+  api.value
+    .search({
+      query: unref(query),
+      sort: ordering.value,
+      offset: offset,
+      limit: pagination.value.limit,
+    })
+    .then((r) => {
+      entries.value = r.results;
+      searchState.value.setState(State.Main);
+      if (r.offset) pagination.value.offset = r.offset;
+      pagination.value.total = r.total;
+    })
+    .catch((err) => pageState.value.setError(err));
 }
+
+function _search(req: SequenceSearchRequest) {
+  if (req.type === "protein" && req.mode === "exact") {
+    const clauses = req.sequences.map((s) => ({
+      field: "protein",
+      op: "==",
+      value: req.sequences[0],
+    }));
+    query.value = { op: "or", value: clauses };
+    search();
+  }
+}
+const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
+
+function updateAllColumns(info: SearchInfo) {
+  const index = allColumns.value.reduce(
+    (a, v) => {
+      a[v.key] = v;
+      return a;
+    },
+    {} as Record<string, Option>,
+  );
+
+  for (const f of info.fields) {
+    const o = index[f.field];
+    if (o) {
+      o.sortable = "sortable" in f ? f.sortable : false;
+    }
+  }
+}
+function init() {
+  pageState.value.setState(State.Loading);
+  api.value
+    .searchinfo()
+    .then((r) => {
+      searchinfo.value = r;
+      updateAllColumns(r);
+      pageState.value.setState(State.Main);
+    })
+    .catch((err) => pageState.value.setError(err));
+}
+onMounted(init);
 </script>
 
 <template>
   <main class="container pt-5">
-    <SequenceSelectionPanel @search="_search" />
+    <SequenceSelectionPanel
+      @search="_search"
+      :submitting="searchState.loading"
+    />
     <ResultsPanel
       ref="resultsPanel"
       :api="api"

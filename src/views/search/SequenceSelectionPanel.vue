@@ -1,143 +1,132 @@
 <template>
-  <div class="container page-body flex-grow-1">
+  <div class="container page-body flex-grow-1 mb-5 pb-5">
     <div class="row">
       <h2>Sequence search</h2>
     </div>
+    <ul class="nav nav-underline">
+      <li class="nav-item">
+        <span class="nav-link disabled">Search by</span>
+      </li>
+      <li v-for="e of sequenceMode" :key="e" class="nav-item">
+        <button
+          class="nav-link"
+          :class="{ active: e == activeSequenceMode }"
+          aria-current="page"
+          @click="activeSequenceMode = e"
+        >
+          {{ e }}
+        </button>
+      </li>
+    </ul>
+
     <form ref="submitform" @submit.prevent="submit()">
-      <div class="mb-3">
+      <template v-if="activeSequenceMode === 'Protein sequence(s)'">
         <textarea
           class="form-control form-control-lg"
           type="text"
           v-model="sequence"
-          id="searchfield"
-          name="searchfield"
-          placeholder="Paste your ID, protein or sORF sequence here..."
-          aria-label="Paste your ID, protein or sORF sequence here..."
+          placeholder="Paste your protein sequence here..."
+          aria-label="Paste your protein sequence here..."
           autofocus="true"
           rows="3"
-          minlength="7"
-          maxlength="303"
-          required="true"
         ></textarea>
         <p>Examples: MRTGNAN, ...</p>
-      </div>
-      <div class="input-group mb-3">
+      </template>
+      <template v-if="activeSequenceMode === 'Nucleotide sequence(s)'">
+        <textarea
+          class="form-control form-control-lg"
+          type="text"
+          v-model="sequence"
+          placeholder="Paste your nucleotide sequence here..."
+          aria-label="Paste your nucleotide sequence here..."
+          autofocus="true"
+          rows="3"
+        ></textarea>
+        <p>Example: ATGCGGG, ...</p>
+      </template>
+      <template
+        v-if="
+          activeSequenceMode === 'Nucleotide sequence(s)' ||
+          activeSequenceMode === 'Protein sequence(s)'
+        "
+      >
         <input
           class="form-control"
           type="file"
           id="fastaFile"
+          @input="updateSequenceFile"
           accept=".faa,.fas,.fna,.fasta,.faa.gz,.fna.gz,.fas.gz,.fasta.gz"
         />
-      </div>
-      <h5 class="mb-2">Input type</h5>
-      <div class="mb-3">
-        <label class="form-check-label" for="inputTypeAuto">
-          <input
-            class="form-check-input"
-            type="radio"
-            v-model="inputType"
-            value="auto"
-            name="inputType"
-            id="inputTypeAuto"
-            checked
-          />
-          Auto
-        </label>
-        <label class="form-check-label" for="inputTypeProtein">
-          <input
-            class="form-check-input"
-            type="radio"
-            v-model="inputType"
-            value="protein"
-            name="inputType"
-            id="inputTypeProtein"
-          />
-          Protein
-        </label>
-        <label class="form-check-label" for="inputTypeDNA">
-          <input
-            class="form-check-input"
-            type="radio"
-            v-model="inputType"
-            value="dna"
-            name="inputType"
-            id="inputTypeDNA"
-          />
-          DNA
-        </label>
-        <label class="form-check-label" for="inputTypeId">
-          <input
-            class="form-check-input"
-            type="radio"
-            v-model="inputType"
-            value="id"
-            name="inputType"
-            id="inputTypeId"
-          />
-          ID
+      </template>
+      <template v-if="activeSequenceMode === 'Ids'">
+        <textarea
+          class="form-control form-control-lg"
+          type="text"
+          v-model="sequence"
+          placeholder="Paste your ids here (one id per line)..."
+          aria-label="Paste your ids here (one id per line)..."
+          autofocus="true"
+          rows="3"
+        ></textarea>
+        <p>Examples:</p>
+        <pre>
+          GenBank|AAAC01000001.1|sORF_1453359_1453485_-
+          GenBank|AAAC01000001.1|sORF_1534298_1534442_-
+        </pre>
+      </template>
+      <h5 class="mb-2">Search mode:</h5>
+      <div
+        v-for="mode of alignModes"
+        :key="mode"
+        class="form-check form-check-inline"
+      >
+        <input
+          class="form-check-input"
+          type="radio"
+          :id="`${mode}-radio`"
+          :value="mode"
+          v-model="activeAlignMode"
+        />
+        <label class="form-check-label" :for="`${mode}-radio`">
+          {{ mode }}
         </label>
       </div>
 
-      <h5 class="mb-2">Search type</h5>
-      <div class="mb-3">
-        <label class="form-check-label" for="inputTypeAuto">
-          <input
-            class="form-check-input"
-            type="radio"
-            v-model="searchType"
-            value="auto"
-            name="searchType"
-            id="searchType"
-            checked
-          />
-          Exact (fast)
-        </label>
-        <label class="form-check-label" for="inputTypeProtein">
-          <input
-            class="form-check-input"
-            type="radio"
-            v-model="searchType"
-            value="protein"
-            name="searchType"
-            id="searchType"
-          />
-          BLAST
-        </label>
-      </div>
+      <template v-if="activeAlignMode === 'Blast'">
+        <h5 class="mb-2">BLAST search parameters</h5>
+        <div class="mb-3">
+          <label class="form-label" for="identity">
+            Identity
+            <input
+              class="form-control"
+              type="number"
+              min="30"
+              max="100"
+              v-model.number="identity"
+              id="identity"
+            />
+          </label>
+          <label class="form-label" for="coverage">
+            Coverage
+            <input
+              class="form-control"
+              type="number"
+              min="30"
+              max="100"
+              v-model.number="coverage"
+              id="coverage"
+            />
+          </label>
+        </div>
+      </template>
 
-      <h5 class="mb-2">BLAST search parameters</h5>
-      <div class="mb-3">
-        <label class="form-label" for="identity">
-          Identity
-          <input
-            class="form-control"
-            type="number"
-            min="30"
-            max="100"
-            v-model.number="identity"
-            id="identity"
-          />
-        </label>
-        <label class="form-label" for="coverage">
-          Coverage
-          <input
-            class="form-control"
-            type="number"
-            min="30"
-            max="100"
-            v-model.number="coverage"
-            id="coverage"
-          />
-        </label>
-      </div>
-
-      <div class="d-flex justify-content-beginning mb-5">
+      <div class="d-flex justify-content-end mb-5">
         <button
           v-if="!submitting"
           class="btn btn-primary"
           type="button"
           id="submit-button"
-          :disabled="!valid"
+          :disabled="!isValid"
           @click="submit"
         >
           Search
@@ -152,104 +141,64 @@
         </button>
       </div>
     </form>
-    <notification :message="error" />
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { validateDNA, validateProtein } from "@/search-validator";
+import { computed, ref, type PropType } from "vue";
 import type { SequenceSearchRequest } from "./SequenceSearchRequest";
-import Notification from "@/components/Notification.vue";
-import {
-  guessInputType,
-  matchesIdScheme,
-  validateDNA,
-  validateProtein,
-} from "@/search-validator";
+
+const props = defineProps({
+  submitting: { type: Boolean as PropType<boolean>, required: true },
+});
 const emit = defineEmits<{
   (e: "search", v: SequenceSearchRequest): void;
 }>();
 
-const error = ref("");
+const sequenceMode = [
+  "Protein sequence(s)",
+  "Nucleotide sequence(s)",
+  "Ids",
+] as const;
+const activeSequenceMode = ref<(typeof sequenceMode)[number]>(sequenceMode[0]);
+const alignModes = ["Exact", "Blast"] as const;
+const activeAlignMode = ref<(typeof alignModes)[number]>(alignModes[0]);
+
+const isValid = computed(() => {
+  if (activeAlignMode.value === "Exact" && sequence.value.length > 0)
+    if (
+      activeSequenceMode.value === "Protein sequence(s)" &&
+      validateProtein(sequence.value)
+    )
+      return true;
+    else if (
+      activeSequenceMode.value === "Nucleotide sequence(s)" &&
+      validateDNA(sequence.value)
+    )
+      return true;
+
+  return false;
+});
+
+function updateSequenceFile(evt: Event) {
+  if (evt.target instanceof HTMLInputElement && evt.target.files) {
+    sequenceFile.value = evt.target.files.item(0);
+  }
+}
+
 const sequence = ref("");
-const sequenceLength = ref(sequence.value.length);
-const sequenceFile = ref(null);
-const inputType = ref("auto");
-const searchType = ref("exact");
+const sequenceFile = ref<File | null>(null);
 const identity = ref(90);
 const coverage = ref(80);
-const submitting = ref(false);
-const validSequence = ref(false);
-const validSequenceFile = ref(false);
-const valid = ref(false);
 
-watch(sequence, (newSequence) => {
-  sequenceLength.value = newSequence.length;
-  if (newSequence.length == 0) {
-    validSequence.value = false;
-    error.value = "";
-  } else if (inputType.value == "auto") {
-    let guessedType = guessInputType(newSequence);
-    if (guessedType.valid) {
-      inputType.value = guessedType.type;
-      validSequence.value = true;
-      error.value = "";
-    } else {
-      validSequence.value = false;
-      error.value = "Could not guess input type.";
-    }
-  } else if (inputType.value == "protein" && validateProtein(newSequence)) {
-    validSequence.value = true;
-    error.value = "";
-  } else if (inputType.value == "dna" && validateDNA(newSequence)) {
-    validSequence.value = true;
-    error.value = "";
-  } else if (inputType.value == "id" && matchesIdScheme(newSequence)) {
-    validSequence.value = true;
-    error.value = "";
-  } else {
-    validSequence.value = false;
-    error.value = `Could not match input with type: ${inputType.value}`;
-  }
-});
-watch(inputType, (newInputType) => {
-  if (sequence.value.length == 0) {
-    validSequence.value = false;
-    error.value = "";
-  } else if (newInputType == "auto") {
-    let guessedType = guessInputType(sequence.value);
-    if (guessedType.valid) {
-      inputType.value = guessedType.type;
-      validSequence.value = true;
-      error.value = "";
-    } else {
-      validSequence.value = false;
-      error.value = "Could not guess input type.";
-    }
-  } else if (newInputType == "protein" && validateProtein(sequence.value)) {
-    validSequence.value = true;
-    error.value = "";
-  } else if (newInputType == "dna" && validateDNA(sequence.value)) {
-    validSequence.value = true;
-    error.value = "";
-  } else if (newInputType == "id" && matchesIdScheme(sequence.value)) {
-    validSequence.value = true;
-    error.value = "";
-  } else {
-    validSequence.value = false;
-    error.value = `Could not match input with type: ${inputType.value}`;
-  }
-});
-watch(validSequence, (v) => {
-  if (v) {
-    valid.value = true;
-    error.value = "";
-  } else {
-    valid.value = false;
-  }
-});
 const submit = () => {
-  submitting.value = true;
-  console.log(sequence.value, inputType.value);
-  console.log(sequence.value);
+  if (activeSequenceMode.value === "Protein sequence(s)") {
+    if (activeAlignMode.value === "Exact")
+      emit("search", {
+        mode: "exact",
+        sequences: [sequence.value],
+        type: "protein",
+      });
+  }
 };
 </script>
