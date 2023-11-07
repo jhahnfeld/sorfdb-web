@@ -45,7 +45,7 @@ const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
 
 const api = useApi();
-const pagination: Ref<PaginationData> = ref(empty());
+const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });
 const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
 const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
@@ -387,7 +387,7 @@ onBeforeUnmount(() => {
               :error="exportError"
             />
           </div>
-          <div class="col-12">
+          <div class="col-12 overflow-x-auto">
             <ResultTable
               :ordering="ordering"
               :entries="entries"
