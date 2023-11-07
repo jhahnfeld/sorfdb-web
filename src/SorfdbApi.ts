@@ -7,7 +7,9 @@ import {
 } from "./model/TsvSearchResult";
 import {
   SorfdbSearchResultSchema,
+  SorfdbEntrySchema,
   type SorfdbSearchResult,
+  type SorfdbEntry,
 } from "./model/SorfdbSearchResult";
 
 let baseurl: string = "http://localhost:8080";
@@ -16,6 +18,7 @@ function initApi(url: string) {
 }
 
 interface SorfdbApi {
+  entry(id: string): Promise<SorfdbEntry>;
   search(request: SearchRequest): Promise<SorfdbSearchResult>;
   searchTsv(
     request: SearchRequest,
@@ -38,7 +41,11 @@ class SorfdbApiImpl implements SorfdbApi {
         .then((t) => Promise.reject(`${r.status}: ${r.statusText}\n${t}`));
     return r.text().then(json5.parse);
   }
-
+  entry(id: string): Promise<SorfdbEntry> {
+    return fetch(baseurl + "/entries/" + encodeURIComponent(id))
+      .then(this.toJson)
+      .then((j) => SorfdbEntrySchema.parse(j));
+  }
   searchinfo(): Promise<SearchInfo> {
     return fetch(baseurl + "/search/_info")
       .then(this.toJson)
