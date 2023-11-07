@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { useApi } from "@/BakrepApi";
 import usePageState, { State } from "@/PageState";
+import { useApi } from "@/SorfdbApi";
+import { type Option } from "@/components/CheckboxOption";
 import Loading from "@/components/Loading.vue";
-import {
-  empty,
-  toPosition,
-  type PaginationData,
-  type PositionInResult,
-} from "@/components/pagination/Pagination";
-import Pagination from "@/components/pagination/Pagination.vue";
+import { type PaginationData } from "@/components/pagination/Pagination";
 import QueryBuilder from "@/components/querybuilder/QueryBuilder.vue";
 import type {
   LeafRule,
   NestedRule,
   Rule,
 } from "@/components/querybuilder/Rule";
-import type { BakrepSearchResultEntry } from "@/model/BakrepSearchResult";
 import type {
   CompoundQuery,
   SearchInfo,
@@ -23,104 +17,67 @@ import type {
   SortDirection,
   SortOption,
 } from "@/model/Search";
-import { saveAs } from "file-saver";
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  unref,
-  type Ref,
-} from "vue";
-import ExportProgress from "./ExportProgress.vue";
-import { downloadFullTsv, type ProgressEvent } from "./ExportTsv";
-import ResultTable from "./ResultTable.vue";
-import { type Option } from "@/components/CheckboxOption";
-import CheckboxSelection from "@/components/CheckboxSelectionWithVModel.vue";
-import CheckboxDropdown from "@/components/DropdownCheckbox.vue";
-
+import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
+import { computed, onMounted, ref, unref, type Ref, shallowRef } from "vue";
+import { resultTableColums } from "./ResultColumns";
+import ResultsPanel from "./ResultsPanel.vue";
 const pageState = usePageState();
 const searchState = usePageState();
-const entries: Ref<BakrepSearchResultEntry[]> = ref([]);
+const entries: Ref<SorfdbEntry[]> = ref([]);
 
-const api = useApi();
-const pagination: Ref<PaginationData> = ref(empty());
+const api = shallowRef(useApi());
+const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });
 const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
 const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
+const exportInProgress = ref(false);
 
-const selectedColumns = ref<Option[]>([
-  { label: "sORF ID", key: "id" },
-  { label: "Species", key: "species" },
-  { label: "sORF length", key: "slen" },
-  { label: "Start codon", key: "start-codon" },
-  { label: "Protein length", key: "plen" },
-  { label: "Product", key: "product" },
-  { label: "Ribosomal binding site", key: "rbs" },
-  { label: "Pfam hits", key: "pfam-hits" },
-  { label: "Gravy", key: "gravy" },
-  { label: "Aromaticity", key: "aromaticity" },
-  { label: "Molecular weight", key: "molecular-weight" },
-  { label: "Instability", key: "instability" },
-  { label: "Isoelectric point", key: "isoelectric-point" },
-  { label: "Aliphatic-index", key: "aliphatic-index" },
-  { label: "Boman", key: "boman" },
-]);
-const defaultSelectedColumns: Option[] = selectedColumns.value;
-const columnIDs: Option[] = [
-  { label: "sORF ID", key: "id" },
-  { label: "Source database", key: "source" },
-  { label: "GenBank Assembly", key: "assembly" },
-  { label: "GenBank/SmProt Accession", key: "accession" },
-  { label: "GenBank/SmProt Protein ID", key: "protein-id" },
-  { label: "UniProtKB/Swiss-Prot UID", key: "uid" },
-  { label: "UniProtKB/Swiss-Prot entry name", key: "entry-name" },
-];
-const columnTaxonomy: Option[] = [
-  { label: "Phylum", key: "phylum" },
-  { label: "Class", key: "class" },
-  { label: "Order", key: "order" },
-  { label: "Family", key: "family" },
-  { label: "Genus", key: "genus" },
-  { label: "Species", key: "species" },
-  { label: "Strain", key: "strain" },
-];
-const columnSequenceFeatures: Option[] = [
-  { label: "sORF", key: "sorf" },
-  { label: "sORF length", key: "slen" },
-  { label: "Start codon", key: "start-codon" },
-  { label: "Protein", key: "protein" },
-  { label: "Protein length", key: "plen" },
-  { label: "Product", key: "product" },
-  { label: "Ribosomal binding site", key: "rbs" },
-];
-const columnDescriptors: Option[] = [
-  { label: "Pfam hits", key: "pfam-hits" },
-  { label: "Gravy", key: "gravy" },
-  { label: "Aromaticity", key: "aromaticity" },
-  { label: "Molecular weight", key: "molecular-weight" },
-  { label: "Instability", key: "instability" },
-  { label: "Isoelectric point", key: "isoelectric-point" },
-  { label: "Aliphatic-index", key: "aliphatic-index" },
-  { label: "Boman", key: "boman" },
-];
+const allColumns = ref<Option[]>(resultTableColums());
+
+function updateAllColumns(info: SearchInfo) {
+  const index = allColumns.value.reduce(
+    (a, v) => {
+      a[v.key] = v;
+      return a;
+    },
+    {} as Record<string, Option>,
+  );
+
+  for (const f of info.fields) {
+    const o = index[f.field];
+    if (o) {
+      o.sortable = "sortable" in f ? f.sortable : false;
+    }
+  }
+}
+
+const fieldNames = computed(() => {
+  const out: Record<string, string> = {};
+  for (const col of allColumns.value) {
+    out[col.key] = col.label;
+  }
+  return out;
+});
 
 function init() {
   pageState.value.setState(State.Loading);
-  api
+  api.value
     .searchinfo()
     .then((r) => {
       searchinfo.value = r;
+      updateAllColumns(r);
       pageState.value.setState(State.Main);
     })
     .catch((err) => pageState.value.setError(err));
 }
 
 function searchinfo2querybuilderrules(f: SearchInfoField): Rule {
+  const label =
+    f.field in fieldNames.value ? fieldNames.value[f.field] : f.field;
   if (f.type === "nested") {
     const nestedRule: NestedRule = {
       field: f.field,
-      label: f.field in fieldNames ? fieldNames[f.field] : f.field,
+      label: label,
       type: "nested",
       rules: f.fields.map(searchinfo2querybuilderrules),
     };
@@ -128,7 +85,7 @@ function searchinfo2querybuilderrules(f: SearchInfoField): Rule {
   } else {
     const leafRule: LeafRule = {
       field: f.field,
-      label: f.field in fieldNames ? fieldNames[f.field] : f.field,
+      label: label,
       type: f.type as "number" | "text",
       ops: f.ops.map((o) => ({ label: o, description: o })),
     };
@@ -142,42 +99,10 @@ const rules: Ref<Rule[]> = computed(() => {
   return out;
 });
 
-const fieldNames: Record<string, string> = {
-  id: "sORF ID",
-  source: "Source database",
-  assembly: "GenBank Assembly",
-  accession: "GenBank/SmProt Accession",
-  "protein-id": "GenBank/SmProt Protein ID",
-  uid: "UniProtKB/Swiss-Prot UID",
-  "entry-name": "UniProtKB/Swiss-Prot entry name",
-  phylum: "Phylum",
-  class: "Class",
-  order: "Order",
-  family: "Family",
-  genus: "Genus",
-  species: "Species",
-  strain: "Strain",
-  sorf: "sORF",
-  slen: "sORF length",
-  "start-codon": "Start codon",
-  protein: "Protein",
-  plen: "Protein length",
-  product: "Product",
-  rbs: "Ribosomal binding site",
-  "pfam-hits": "Pfam hits",
-  gravy: "Gravy",
-  aromaticity: "Aromaticity",
-  "molecular-weight": "Molecular weight",
-  instability: "Instability",
-  "isoelectric-point": "Isoelectric point",
-  "aliphatic-index": "Aliphatic-index",
-  boman: "Boman",
-};
-
 function search(offset = 0) {
   searchState.value.setState(State.Loading);
-  resetTsvExport();
-  api
+  if (resultsPanel.value) resultsPanel.value.resetTsvExport();
+  api.value
     .search({
       query: unref(query),
       sort: ordering.value,
@@ -193,18 +118,6 @@ function search(offset = 0) {
     .catch((err) => pageState.value.setError(err));
 }
 
-function clearSelection() {
-  selectedColumns.value = [];
-}
-
-function resetSelection() {
-  selectedColumns.value = defaultSelectedColumns;
-}
-
-const positionInResults: Ref<PositionInResult> = computed(() =>
-  toPosition(pagination.value),
-);
-
 function updateOrdering(sortkey: string, direction: SortDirection | null) {
   const idx = ordering.value.findIndex((s) => s.field === sortkey);
   if (direction == null) {
@@ -217,47 +130,9 @@ function updateOrdering(sortkey: string, direction: SortDirection | null) {
   search();
 }
 
-let cancelExport: AbortController | undefined = undefined;
-const progress = ref<ProgressEvent>();
-const exportError = ref<string>();
-const exportInProgress = ref(false);
-function exportTsv() {
-  exportError.value = undefined;
-  exportInProgress.value = true;
-  progress.value = { total: pagination.value.total, count: 0, progress: 0 };
-  cancelExport = downloadFullTsv(
-    api,
-    {
-      query: query.value,
-      sort: [{ field: "id", ord: "asc" }],
-    },
-    {
-      onError: (e) => {
-        exportError.value = e as string;
-        exportInProgress.value = false;
-      },
-      onFinished: (d) => {
-        const blob = new Blob([d], {
-          type: "text/tab-separated-values;charset=utf-8",
-        });
-        saveAs(blob, "bakrep-export.tsv");
-        exportInProgress.value = false;
-        cancelExport = undefined;
-      },
-      onProgress: (p) => (progress.value = p),
-    },
-  );
-}
-function resetTsvExport() {
-  progress.value = undefined;
-  exportError.value = undefined;
-  exportInProgress.value = false;
-}
+const resultsPanel = ref<typeof ResultsPanel>();
 
 onMounted(init);
-onBeforeUnmount(() => {
-  if (cancelExport) cancelExport.abort();
-});
 </script>
 
 <template>
@@ -269,113 +144,33 @@ onBeforeUnmount(() => {
           <QueryBuilder v-model:query="query" :rules="rules" @submit="search" />
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-12">
-          <div class="d-flex mt-2 mb-5 justify-content-end">
-            <button
-              @click="search(0)"
-              class="btn btn-primary"
-              type="button"
-              id="button-search"
-              :disabled="exportInProgress"
-            >
-              Search
-            </button>
-          </div>
-        </div>
-
-        <div class="btn-group">
-          <CheckboxDropdown title="Show IDs">
-            <CheckboxSelection v-model="selectedColumns" :options="columnIDs" />
-          </CheckboxDropdown>
-          <CheckboxDropdown title="Show taxonomy">
-            <CheckboxSelection
-              v-model="selectedColumns"
-              :options="columnTaxonomy"
-            />
-          </CheckboxDropdown>
-          <CheckboxDropdown title="Show sequence features">
-            <CheckboxSelection
-              v-model="selectedColumns"
-              :options="columnSequenceFeatures"
-            />
-          </CheckboxDropdown>
-          <CheckboxDropdown title="Show protein descriptors">
-            <CheckboxSelection
-              v-model="selectedColumns"
-              :options="columnDescriptors"
-            />
-          </CheckboxDropdown>
-          <div class="px-2">
-            <button
-              @click="clearSelection()"
-              class="btn btn-secondary"
-              type="button"
-              id="button-search"
-            >
-              Clear
-            </button>
-          </div>
-          <div class="px-2">
-            <button
-              @click="resetSelection()"
-              class="btn btn-secondary"
-              type="button"
-              id="button-search"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <li v-for="item in selectedColumns" :key="item.key">
-            {{ item }}
-          </li>
+      <div class="col-12">
+        <div class="d-flex mt-2 mb-5 justify-content-end">
+          <button
+            @click="search(0)"
+            class="btn btn-primary"
+            type="button"
+            id="button-search"
+            :disabled="exportInProgress"
+          >
+            Search
+          </button>
         </div>
       </div>
-      <Loading :state="searchState">
-        <div class="row">
-          <div class="col-12 d-flex justify-content-between align-items-end">
-            <div class="fs-tiny">
-              Showing search results {{ positionInResults.firstElement }}-{{
-                positionInResults.lastElement
-              }}
-              of {{ pagination.total }} results
-            </div>
-            <div v-if="pagination.total > 0">
-              <button
-                class="btn btn-sm btn-link link-secondary"
-                @click="exportTsv"
-                :disabled="exportInProgress"
-              >
-                Export as tsv
-              </button>
-            </div>
-          </div>
-          <div class="col-12">
-            <ExportProgress
-              v-if="progress"
-              :progress="progress"
-              :error="exportError"
-            />
-          </div>
-          <div class="col-12">
-            <ResultTable
-              :ordering="ordering"
-              :entries="entries"
-              @update:ordering="updateOrdering"
-            />
-          </div>
-          <Pagination
-            v-if="pagination.total > 0"
-            class="mt-3"
-            :value="pagination"
-            @update:offset="search"
-          />
-        </div>
-      </Loading>
+      <ResultsPanel
+        ref="resultsPanel"
+        :api="api"
+        :all-columns="allColumns"
+        :entries="entries"
+        :pagination="pagination"
+        :ordering="ordering"
+        :query="query"
+        :search-state="searchState"
+        :export-in-progress="exportInProgress"
+        @search="search"
+        @update:ordering="updateOrdering"
+        @update:exportInProgress="(e) => (exportInProgress = e)"
+      />
     </Loading>
   </main>
 </template>
