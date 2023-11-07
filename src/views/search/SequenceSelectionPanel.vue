@@ -158,6 +158,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import type { SequenceSearchRequest } from "./SequenceSearchRequest";
+import Notification from "@/components/Notification.vue";
 import {
   guessInputType,
   matchesIdScheme,
