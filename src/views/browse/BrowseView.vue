@@ -49,61 +49,104 @@ const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
 const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
 
-const selectedColumns = ref<Option[]>([
-  { label: "sORF ID", key: "id", link: true },
-  { label: "Species", key: "species" },
-  { label: "sORF length", key: "slen" },
-  { label: "Start codon", key: "start-codon" },
-  { label: "Protein length", key: "plen" },
-  { label: "Product", key: "product" },
-  { label: "Ribosomal binding site", key: "rbs" },
-  { label: "Pfam hits", key: "pfam-hits" },
-  { label: "Gravy", key: "gravy" },
-  { label: "Aromaticity", key: "aromaticity" },
-  { label: "Molecular weight", key: "molecular-weight" },
-  { label: "Instability", key: "instability" },
-  { label: "Isoelectric point", key: "isoelectric-point" },
-  { label: "Aliphatic-index", key: "aliphatic-index" },
-  { label: "Boman", key: "boman" },
+const allColumns = ref<Option[]>([
+  { group: "General", label: "sORF ID", key: "id", link: true },
+  { group: "General", label: "Source database", key: "source" },
+  { group: "General", label: "GenBank Assembly", key: "assembly" },
+  { group: "General", label: "GenBank/SmProt Accession", key: "accession" },
+  { group: "General", label: "GenBank/SmProt Protein ID", key: "protein-id" },
+  { group: "General", label: "UniProtKB/Swiss-Prot UID", key: "uid" },
+  {
+    group: "General",
+    label: "UniProtKB/Swiss-Prot entry name",
+    key: "entry-name",
+  },
+  { group: "Taxonomy", label: "Phylum", key: "phylum" },
+  { group: "Taxonomy", label: "Class", key: "class" },
+  { group: "Taxonomy", label: "Order", key: "order" },
+  { group: "Taxonomy", label: "Family", key: "family" },
+  { group: "Taxonomy", label: "Genus", key: "genus" },
+  { group: "Taxonomy", label: "Species", key: "species" },
+  { group: "Taxonomy", label: "Strain", key: "strain" },
+  { group: "Sequence&nbsp;features", label: "sORF", key: "sorf" },
+  { group: "Sequence&nbsp;features", label: "sORF length", key: "slen" },
+  { group: "Sequence&nbsp;features", label: "Start codon", key: "start-codon" },
+  { group: "Sequence&nbsp;features", label: "Protein", key: "protein" },
+  { group: "Sequence&nbsp;features", label: "Protein length", key: "plen" },
+  { group: "Sequence&nbsp;features", label: "Product", key: "product" },
+  {
+    group: "Sequence&nbsp;features",
+    label: "Ribosomal binding site",
+    key: "rbs",
+  },
+  { group: "Protein&nbsp;descriptors", label: "Pfam hits", key: "pfam-hits" },
+  { group: "Protein&nbsp;descriptors", label: "Gravy", key: "gravy" },
+  {
+    group: "Protein&nbsp;descriptors",
+    label: "Aromaticity",
+    key: "aromaticity",
+  },
+  {
+    group: "Protein&nbsp;descriptors",
+    label: "Molecular weight",
+    key: "molecular-weight",
+  },
+  {
+    group: "Protein&nbsp;descriptors",
+    label: "Instability",
+    key: "instability",
+  },
+  {
+    group: "Protein&nbsp;descriptors",
+    label: "Isoelectric point",
+    key: "isoelectric-point",
+  },
+  {
+    group: "Protein&nbsp;descriptors",
+    label: "Aliphatic-index",
+    key: "aliphatic-index",
+  },
+  { group: "Protein&nbsp;descriptors", label: "Boman", key: "boman" },
 ]);
-const defaultSelectedColumns: Option[] = selectedColumns.value;
-const columnIDs: Option[] = [
-  { label: "sORF ID", key: "id" },
-  { label: "Source database", key: "source" },
-  { label: "GenBank Assembly", key: "assembly" },
-  { label: "GenBank/SmProt Accession", key: "accession" },
-  { label: "GenBank/SmProt Protein ID", key: "protein-id" },
-  { label: "UniProtKB/Swiss-Prot UID", key: "uid" },
-  { label: "UniProtKB/Swiss-Prot entry name", key: "entry-name" },
+
+const defaultColumns = [
+  "id",
+  "species",
+  "slen",
+  "start-codon",
+  "plen",
+  "product",
+  "rbs",
+  "pfam-hits",
+  "gravy",
+  "aromaticity",
+  "molecular-weight",
+  "instability",
+  "isoelectric-point",
+  "aliphatic-index",
+  "boman",
 ];
-const columnTaxonomy: Option[] = [
-  { label: "Phylum", key: "phylum" },
-  { label: "Class", key: "class" },
-  { label: "Order", key: "order" },
-  { label: "Family", key: "family" },
-  { label: "Genus", key: "genus" },
-  { label: "Species", key: "species" },
-  { label: "Strain", key: "strain" },
-];
-const columnSequenceFeatures: Option[] = [
-  { label: "sORF", key: "sorf" },
-  { label: "sORF length", key: "slen" },
-  { label: "Start codon", key: "start-codon" },
-  { label: "Protein", key: "protein" },
-  { label: "Protein length", key: "plen" },
-  { label: "Product", key: "product" },
-  { label: "Ribosomal binding site", key: "rbs" },
-];
-const columnDescriptors: Option[] = [
-  { label: "Pfam hits", key: "pfam-hits" },
-  { label: "Gravy", key: "gravy" },
-  { label: "Aromaticity", key: "aromaticity" },
-  { label: "Molecular weight", key: "molecular-weight" },
-  { label: "Instability", key: "instability" },
-  { label: "Isoelectric point", key: "isoelectric-point" },
-  { label: "Aliphatic-index", key: "aliphatic-index" },
-  { label: "Boman", key: "boman" },
-];
+
+const selectedColumns = ref<string[]>([...defaultColumns]);
+const visibleColumns = computed(() => {
+  return allColumns.value.filter((c) =>
+    selectedColumns.value.some((s) => s == c.key),
+  );
+});
+const groupedColumns = computed(() => {
+  const groups: Record<string, Option[]> = {};
+  for (const c of allColumns.value) {
+    if (!(c.group in groups)) {
+      groups[c.group] = [];
+    }
+    groups[c.group].push(c);
+  }
+  return Object.entries(groups);
+});
+
+function updateVisibleColumns(selection: Option[]) {
+  selectedColumns.value = selection.map((x) => x.key);
+}
 
 function init() {
   pageState.value.setState(State.Loading);
@@ -198,7 +241,7 @@ function clearSelection() {
 }
 
 function resetSelection() {
-  selectedColumns.value = defaultSelectedColumns;
+  selectedColumns.value = [...defaultColumns];
 }
 
 const positionInResults: Ref<PositionInResult> = computed(() =>
@@ -288,33 +331,12 @@ onBeforeUnmount(() => {
         <div class="btn-group">
           <CheckboxDropdown title="Select visible columns">
             <div class="d-flex">
-              <div class="mx-3">
-                <h5>General</h5>
+              <div class="mx-4" v-for="g in groupedColumns" :key="g[0]">
+                <h5 v-html="g[0]"></h5>
                 <CheckboxSelection
-                  v-model="selectedColumns"
-                  :options="columnIDs"
-                />
-              </div>
-              <div class="mx-3">
-                <h5>Taxonomy</h5>
-                <CheckboxSelection
-                  v-model="selectedColumns"
-                  :options="columnTaxonomy"
-                />
-              </div>
-              <div class="mx-3">
-                <h5>Sequence&nbsp;features</h5>
-
-                <CheckboxSelection
-                  v-model="selectedColumns"
-                  :options="columnSequenceFeatures"
-                />
-              </div>
-              <div class="mx-3">
-                <h5>Protein&nbsp;descriptors</h5>
-                <CheckboxSelection
-                  v-model="selectedColumns"
-                  :options="columnDescriptors"
+                  :model-value="visibleColumns"
+                  @update:modelValue="updateVisibleColumns"
+                  :options="g[1]"
                 />
               </div>
             </div>
@@ -373,7 +395,7 @@ onBeforeUnmount(() => {
               :ordering="ordering"
               :entries="entries"
               @update:ordering="updateOrdering"
-              :visible-columns="selectedColumns"
+              :visible-columns="visibleColumns"
             />
           </div>
           <Pagination

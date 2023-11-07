@@ -44,9 +44,14 @@ function extractValue(entry: SorfdbEntry, c: Option) {
   <table class="mt-3 table table-hover table-striped">
     <thead>
       <tr>
-        <td v-for="c of visibleColumns" :key="c.key" scope="row">
+        <th
+          class="align-top"
+          v-for="c of visibleColumns"
+          :key="c.key"
+          scope="row"
+        >
           {{ c.label }}
-        </td>
+        </th>
       </tr>
     </thead>
     <tbody>
