@@ -286,27 +286,40 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="btn-group">
-          <CheckboxDropdown title="Show IDs">
-            <CheckboxSelection v-model="selectedColumns" :options="columnIDs" />
+          <CheckboxDropdown title="Select visible columns">
+            <div class="d-flex">
+              <div class="mx-3">
+                <h5>General</h5>
+                <CheckboxSelection
+                  v-model="selectedColumns"
+                  :options="columnIDs"
+                />
+              </div>
+              <div class="mx-3">
+                <h5>Taxonomy</h5>
+                <CheckboxSelection
+                  v-model="selectedColumns"
+                  :options="columnTaxonomy"
+                />
+              </div>
+              <div class="mx-3">
+                <h5>Sequence&nbsp;features</h5>
+
+                <CheckboxSelection
+                  v-model="selectedColumns"
+                  :options="columnSequenceFeatures"
+                />
+              </div>
+              <div class="mx-3">
+                <h5>Protein&nbsp;descriptors</h5>
+                <CheckboxSelection
+                  v-model="selectedColumns"
+                  :options="columnDescriptors"
+                />
+              </div>
+            </div>
           </CheckboxDropdown>
-          <CheckboxDropdown title="Show taxonomy">
-            <CheckboxSelection
-              v-model="selectedColumns"
-              :options="columnTaxonomy"
-            />
-          </CheckboxDropdown>
-          <CheckboxDropdown title="Show sequence features">
-            <CheckboxSelection
-              v-model="selectedColumns"
-              :options="columnSequenceFeatures"
-            />
-          </CheckboxDropdown>
-          <CheckboxDropdown title="Show protein descriptors">
-            <CheckboxSelection
-              v-model="selectedColumns"
-              :options="columnDescriptors"
-            />
-          </CheckboxDropdown>
+
           <div class="px-2">
             <button
               @click="clearSelection()"
@@ -314,7 +327,7 @@ onBeforeUnmount(() => {
               type="button"
               id="button-search"
             >
-              Clear
+              Clear selected columns
             </button>
           </div>
           <div class="px-2">
@@ -324,15 +337,9 @@ onBeforeUnmount(() => {
               type="button"
               id="button-search"
             >
-              Reset
+              Reset columns to default
             </button>
           </div>
-        </div>
-
-        <div>
-          <li v-for="item in selectedColumns" :key="item.key">
-            {{ item }}
-          </li>
         </div>
       </div>
       <Loading :state="searchState">
@@ -366,9 +373,8 @@ onBeforeUnmount(() => {
               :ordering="ordering"
               :entries="entries"
               @update:ordering="updateOrdering"
-              :visible-columns="[]"
+              :visible-columns="selectedColumns"
             />
-            <!-- TODO replace placeholder array with real visible columns-->
           </div>
           <Pagination
             v-if="pagination.total > 0"
