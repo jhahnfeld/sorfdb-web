@@ -26,12 +26,13 @@ function matchesAlphabet(seq: string, alphabet: Set<string>): boolean {
   return true;
 }
 
-function matchesIdScheme(sequence: string): boolean {
+function matchesIdScheme(id: string): boolean {
   if (
-    sequence.startsWith("GenBank|") ||
-    sequence.startsWith("SwissProt|") ||
-    sequence.startsWith("UniProt|") ||
-    sequence.startsWith("SmProt|")
+    (id.startsWith("GenBank|") ||
+      id.startsWith("SwissProt|") ||
+      id.startsWith("UniProt|") ||
+      id.startsWith("SmProt|")) &&
+    (id.match(/\|/g) || []).length == 2
   ) {
     return true;
   } else {
@@ -48,12 +49,8 @@ function validateDNA(sequence: string): boolean {
   return matchesAlphabet(sequence, dna_alphabet);
 }
 
-function validateProteinSequences(entries: Array<string>) {
-  return entries.map((x) => validateProtein(x));
-}
-
-function validateDnaSequences(entries: Array<string>) {
-  return entries.map((x) => validateDNA(x));
+function validateInputArray(input: string[], validator: Function): boolean {
+  return input.map((x) => validator(x)).every((b) => b === true);
 }
 
 interface GuessedType {
@@ -94,6 +91,5 @@ export {
   validateProtein,
   validateDNA,
   matchesIdScheme,
-  validateProteinSequences,
-  validateDnaSequences,
+  validateInputArray,
 };
