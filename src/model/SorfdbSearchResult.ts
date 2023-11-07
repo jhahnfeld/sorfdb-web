@@ -27,7 +27,7 @@ const SorfdbEntrySchema = z.object({
   plen: z.number(),
   product: z.string(),
   rbs: z.nullable(z.number()),
-  "pfam-subject": z.array(PfamEntryScheme),
+  "pfam-hits": z.array(PfamEntryScheme),
   gravy: z.number(),
   aromaticity: z.number(),
   "molecular-weight": z.number(),
