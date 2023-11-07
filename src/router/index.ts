@@ -46,7 +46,7 @@ const router = createRouter({
       component: () => import("../views/ImprintView.vue"),
     },
     {
-      path: "/result/:id/:tab",
+      path: "/result/:id",
       name: "result",
       component: () => import("../views/show-results/ResultView.vue"),
       props: true,

@@ -14,16 +14,10 @@ const props = defineProps({
     default: () => [],
   },
   visibleColumns: {
-    type: Array as PropType<ColumnSetting[]>,
+    type: Array as PropType<Option[]>,
     required: true,
   },
 });
-
-export type ColumnSetting = {
-  label: string;
-  key: string;
-  link?: boolean;
-};
 
 const emit = defineEmits<{
   (e: "update:ordering", key: string, direction: SortDirection | null): void;
@@ -59,7 +53,14 @@ function extractValue(entry: SorfdbEntry, c: Option) {
       <template v-for="entry in entries" :key="entry.id">
         <tr>
           <td v-for="c of visibleColumns" :key="c.key" scope="row">
-            {{ extractValue(entry, c) }}
+            <template v-if="c.link">
+              <router-link :to="{ name: 'result', params: { id: entry.id } }">
+                {{ extractValue(entry, c) }}
+              </router-link>
+            </template>
+            <template v-else>
+              {{ extractValue(entry, c) }}
+            </template>
           </td>
         </tr>
       </template>
@@ -72,4 +73,3 @@ function extractValue(entry: SorfdbEntry, c: Option) {
   cursor: pointer;
 }
 </style>
-@/model/SorfdbSearchResult

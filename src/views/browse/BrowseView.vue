@@ -50,7 +50,7 @@ const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
 
 const selectedColumns = ref<Option[]>([
-  { label: "sORF ID", key: "id" },
+  { label: "sORF ID", key: "id", link: true },
   { label: "Species", key: "species" },
   { label: "sORF length", key: "slen" },
   { label: "Start codon", key: "start-codon" },
