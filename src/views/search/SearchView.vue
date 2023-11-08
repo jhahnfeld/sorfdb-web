@@ -65,7 +65,7 @@ function _search(req: SequenceSearchRequest) {
     const clauses = req.sequences.map((s) => ({
       field: "protein",
       op: "==",
-      value: req.sequences[0],
+      value: s,
     }));
     query.value = { op: "or", value: clauses };
     search();
