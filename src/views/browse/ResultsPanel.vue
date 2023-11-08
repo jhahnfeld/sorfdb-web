@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="btn-group">
+    <div class="btn-group py-3">
       <DropdownCheckbox title="Select visible columns">
         <div class="d-flex">
           <div class="mx-4" v-for="g in groupedColumns" :key="g[0]">
