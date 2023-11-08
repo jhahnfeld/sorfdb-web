@@ -51,10 +51,22 @@ function updateAllColumns(info: SearchInfo) {
   }
 }
 
+type FieldConfiguration = {
+  label: string;
+  group: string;
+};
+
+function fc(label: string, group: string): FieldConfiguration {
+  return {
+    label: label,
+    group: group,
+  };
+}
+
 const fieldNames = computed(() => {
-  const out: Record<string, string> = {};
+  const out: Record<string, FieldConfiguration> = {};
   for (const col of allColumns.value) {
-    out[col.key] = col.label;
+    out[col.key] = fc(col.label, col.group);
   }
   return out;
 });
@@ -72,20 +84,24 @@ function init() {
 }
 
 function searchinfo2querybuilderrules(f: SearchInfoField): Rule {
-  const label =
-    f.field in fieldNames.value ? fieldNames.value[f.field] : f.field;
+  const config = fieldNames.value[f.field];
+  const field = config ? config.label : f.field;
+  const group = config ? config.group : "";
+
   if (f.type === "nested") {
     const nestedRule: NestedRule = {
+      group: group.replace("&nbsp;", " "),
       field: f.field,
-      label: label,
+      label: field,
       type: "nested",
       rules: f.fields.map(searchinfo2querybuilderrules),
     };
     return nestedRule;
   } else {
     const leafRule: LeafRule = {
+      group: group.replace("&nbsp;", " "),
       field: f.field,
-      label: label,
+      label: field,
       type: f.type as "number" | "text",
       ops: f.ops.map((o) => ({ label: o, description: o })),
     };

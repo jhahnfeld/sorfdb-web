@@ -44,9 +44,26 @@
         <div class="row gy-2 gx-3 align-items-center">
           <div class="col-auto">
             <select v-model="selectedRule" class="form-select mr-2">
-              <option v-for="(rule, idx) in rules" :key="idx" :value="idx">
-                {{ rule.label }}
-              </option>
+              <template v-for="(group, idx) in groupedRules" :key="idx">
+                <optgroup v-if="group.name" :label="group.name">
+                  <option
+                    v-for="(rule, jdx) in group.rules"
+                    :key="jdx"
+                    :value="rule.field"
+                  >
+                    {{ rule.label }}
+                  </option>
+                </optgroup>
+                <template v-else>
+                  <option
+                    v-for="(rule, jdx) in group.rules"
+                    :key="jdx"
+                    :value="rule.field"
+                  >
+                    {{ rule.label }}
+                  </option>
+                </template>
+              </template>
             </select>
           </div>
           <div class="col-auto">
@@ -84,9 +101,10 @@
 </template>
 <script setup lang="ts">
 import type { CompoundQuery, Query } from "@/model/Search";
-import { ref, type PropType, computed } from "vue";
+import { ref, type PropType, computed, onMounted } from "vue";
 import type { QueryBuilderOptions, Rule } from "./Rule";
 import QueryGroupChildren from "./QueryGroupChildren.vue";
+import { sortByString } from "@/util/sort";
 
 const props = defineProps({
   index: { type: Number as PropType<number>, required: true },
@@ -108,7 +126,31 @@ const op = computed({
   set: (v) => emit("update:query", props.index, { ...props.query, op: v }),
 });
 
-const selectedRule = ref(0);
+const selectedRule = ref<string>("");
+onMounted(() => {
+  if (props.rules.length > 0) selectedRule.value = props.rules[0].field;
+});
+
+type Group = {
+  name?: string;
+  rules: Rule[];
+};
+
+const groupedRules = computed<Group[]>(() => {
+  const map: Record<string, Group> = {};
+
+  for (const g of props.rules) {
+    const key = g.group ? g.group : "";
+    if (!(key in map)) {
+      map[key] = { name: g.group, rules: [] };
+    }
+    map[key].rules.push(g);
+  }
+
+  const groups = Object.values(map);
+  groups.sort(sortByString((x) => (x.name ? x.name : "")));
+  return groups;
+});
 
 function addGroup() {
   const newQuery = {
@@ -119,40 +161,40 @@ function addGroup() {
 }
 function addRule() {
   if (selectedRule.value !== undefined) {
-    const rule = props.rules[selectedRule.value];
-
-    if (rule.type === "nested") {
-      const newQuery = {
-        ...props.query,
-        value: [
-          ...props.query.value,
-          {
-            field: rule.field,
-            op: "nested",
-            value: {
-              op: "and",
-              value: [],
+    const rule = props.rules.find((x) => x.field == selectedRule.value);
+    if (rule)
+      if (rule.type === "nested") {
+        const newQuery = {
+          ...props.query,
+          value: [
+            ...props.query.value,
+            {
+              field: rule.field,
+              op: "nested",
+              value: {
+                op: "and",
+                value: [],
+              },
             },
-          },
-        ],
-      };
+          ],
+        };
 
-      emit("update:query", props.index, newQuery);
-    } else if ("ops" in rule) {
-      const newQuery = {
-        ...props.query,
-        value: [
-          ...props.query.value,
-          {
-            field: rule.field,
-            op: rule.ops[0].label,
-            value: props.options.defaultValue(rule, rule.ops[0]),
-          },
-        ],
-      };
+        emit("update:query", props.index, newQuery);
+      } else if ("ops" in rule) {
+        const newQuery = {
+          ...props.query,
+          value: [
+            ...props.query.value,
+            {
+              field: rule.field,
+              op: rule.ops[0].label,
+              value: props.options.defaultValue(rule, rule.ops[0]),
+            },
+          ],
+        };
 
-      emit("update:query", props.index, newQuery);
-    }
+        emit("update:query", props.index, newQuery);
+      }
   }
 }
 
