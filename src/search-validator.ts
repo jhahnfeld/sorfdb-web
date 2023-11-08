@@ -1,11 +1,11 @@
-const simple_dna: string[] = "acgtn".split("");
-//const iupac_dna: string[] = "acgtmrwsykvhdbn".split("");
+//const simple_dna: string[] = "acgtn".split("");
+const iupac_dna: string[] = "acgtmrwsykvhdbn".split("");
 const iupac_protein: string[] = "acdefghiklmnpqrstvwy".split("");
 //const idRegex: RegExp = new RegExp('^(Genbank|SwissProt|UniProt|SmProt){1}\|(\w|\.)+\|(\w|\.)+$', 'g');
 
 const dna_alphabet: Set<string> = new Set([
-  ...simple_dna,
-  ...simple_dna.map((x) => x.toUpperCase()),
+  ...iupac_dna,
+  ...iupac_dna.map((x) => x.toUpperCase()),
 ]);
 
 const protein_alphabet: Set<string> = new Set([
