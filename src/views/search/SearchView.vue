@@ -68,8 +68,15 @@ function _search(req: SequenceSearchRequest) {
       value: s,
     }));
     query.value = { op: "or", value: clauses };
-    search();
+  } else if (req.type === "dna" && req.mode === "exact") {
+    const clauses = req.sequences.map((s) => ({
+      field: "sorf",
+      op: "==",
+      value: s,
+    }));
+    query.value = { op: "or", value: clauses };
   }
+  search();
 }
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
 

@@ -28,6 +28,7 @@
           placeholder="Paste your single protein sequence or proteins in FASTA format here..."
           aria-label="Paste your single protein sequence or proteins in FASTA format here..."
           autofocus="true"
+          :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
         <p>Examples: MRTGNAN or</p>
@@ -67,6 +68,11 @@
             accept=".faa,.fas,.fna,.fasta,.faa.gz,.fna.gz,.fas.gz,.fasta.gz"
           />
         </div>
+        <progress-bar
+          v-if="loading"
+          :progress="loadingProgress"
+          :title="loadingProgress.title"
+        />
       </template>
       <template v-if="activeSequenceMode === 'Ids'">
         <textarea
@@ -113,6 +119,7 @@
             :class="{ active: mode == activeAlignMode }"
             aria-current="page"
             @click="activeAlignMode = mode"
+            :disabled="mode == 'Blast' && activeSequenceMode == 'Ids'"
           >
             {{ mode }}
           </button>
@@ -179,9 +186,11 @@ import {
   validateInputArray,
 } from "@/search-validator";
 import { computed, ref, type PropType } from "vue";
-import { parseFastaFromText, excludeFastaHeaders } from "@/fasta-handler";
+import { extractSequencesFromFasta, uniqueArray } from "@/fasta-handler";
 import type { SequenceSearchRequest } from "./SequenceSearchRequest";
 import notificationMessage from "@/components/Notification.vue";
+import ProgressBar from "@/components/ProgressBar.vue";
+import readFileWithProgress from "@/read-file-with-progress";
 
 const props = defineProps({
   submitting: { type: Boolean as PropType<boolean>, required: true },
@@ -200,15 +209,23 @@ const alignModes = ["Exact", "Blast"] as const;
 const activeAlignMode = ref<(typeof alignModes)[number]>(alignModes[0]);
 const sequence = ref("");
 const sequenceFile = ref<File | null>(null);
+const sequenceFileContent = ref("");
+const loading = ref(false);
 const identity = ref(90);
 const coverage = ref(80);
+const loadingProgress = ref({
+  title: "Loading FASTA file...",
+  min: 0,
+  max: 100,
+  value: 0,
+});
 
 function stringToArray(input: string): string[] {
   if ((input.match(/\n/) || []).length == 0) {
     return [input];
   } else {
     if (input.startsWith(">")) {
-      return parseFastaFromText(input);
+      return extractSequencesFromFasta(input);
     } else {
       return input.split("\n");
     }
@@ -217,9 +234,18 @@ function stringToArray(input: string): string[] {
 
 const sequences = computed(() => {
   if (sequence.value.startsWith(">")) {
-    return excludeFastaHeaders(stringToArray(sequence.value));
+    return extractSequencesFromFasta(sequence.value);
+  } else if (sequence.value.length > 0) {
+    if ((sequence.value.match(/\n/) || []).length == 0) {
+      return [sequence.value];
+    } else {
+      return sequence.value.split("\n");
+    }
+  } else if (sequenceFileContent.value.length > 0) {
+    return extractSequencesFromFasta(sequenceFileContent.value);
+  } else {
+    return [];
   }
-  return stringToArray(sequence.value);
 });
 
 const isValid = computed(() => {
@@ -257,6 +283,27 @@ const isValid = computed(() => {
         error: `Could not match input with type: ${activeSequenceMode.value}`,
       };
     }
+  } else if (
+    activeAlignMode.value === "Exact" &&
+    sequence.value.length == 0 &&
+    sequences.value.length > 0
+  ) {
+    if (
+      activeSequenceMode.value === "Protein sequence(s)" &&
+      validateInputArray(sequences.value, validateProtein)
+    ) {
+      return { valid: true, error: "" };
+    } else if (
+      activeSequenceMode.value === "Nucleotide sequence(s)" &&
+      validateInputArray(sequences.value, validateDNA)
+    ) {
+      return { valid: true, error: "" };
+    } else {
+      return {
+        valid: false,
+        error: `Could not match input with type: ${activeSequenceMode.value}`,
+      };
+    }
   }
 
   return {
@@ -265,13 +312,41 @@ const isValid = computed(() => {
   };
 });
 
+function readTextFile(file: File) {
+  loading.value = true;
+  return readFileWithProgress(
+    file,
+    (x: number) => (loadingProgress.value.value = Math.floor(x * 100)),
+  ).then((buffer) => {
+    return new Promise<string>((resolve) => {
+      let decoder = new TextDecoder("utf-8");
+      resolve(decoder.decode(buffer));
+    });
+  });
+}
+
+function setFileSequence(content: string) {
+  loadingProgress.value.title = "Processing file content...";
+  sequenceFileContent.value = content;
+  loading.value = false;
+}
+
 function updateSequenceFile(evt: Event) {
   if (evt.target instanceof HTMLInputElement && evt.target.files) {
     sequenceFile.value = evt.target.files.item(0);
+    if (sequenceFile.value === null) {
+      sequenceFileContent.value = "";
+    } else {
+      readTextFile(sequenceFile.value)
+        .then((r) => setFileSequence(r))
+        .catch((e) => (isValid.value.error = e));
+    }
   }
+  loadingProgress.value.title = "Loading FASTA file...";
 }
 
 const submit = () => {
+  console.log(sequences.value);
   if (activeSequenceMode.value === "Protein sequence(s)") {
     if (activeAlignMode.value === "Exact")
       emit("search", {
@@ -279,6 +354,19 @@ const submit = () => {
         sequences: sequences.value,
         type: "protein",
       });
+  } else if (activeSequenceMode.value === "Nucleotide sequence(s)") {
+    if (activeAlignMode.value === "Exact")
+      emit("search", {
+        mode: "exact",
+        sequences: sequences.value,
+        type: "dna",
+      });
+  } else if (activeSequenceMode.value === "Ids") {
+    emit("search", {
+      mode: "exact",
+      sequences: sequences.value,
+      type: "dna", // TODO set to Ids
+    });
   }
 };
 </script>
