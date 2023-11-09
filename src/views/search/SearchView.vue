@@ -75,6 +75,13 @@ function _search(req: SequenceSearchRequest) {
       value: s,
     }));
     query.value = { op: "or", value: clauses };
+  } else if (req.type === "id") {
+    const clauses = req.ids.map((s) => ({
+      field: "id",
+      op: "==",
+      value: s,
+    }));
+    query.value = { op: "or", value: clauses };
   }
   search();
 }

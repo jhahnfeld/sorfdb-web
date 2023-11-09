@@ -204,6 +204,10 @@ const sequenceMode = [
   "Nucleotide sequence(s)",
   "Ids",
 ] as const;
+const maxSequenceLengths: Record<string, number> = {
+  "Protein sequence(s)": 143,
+  "Nucleotide sequence(s)": 433,
+};
 const activeSequenceMode = ref<(typeof sequenceMode)[number]>(sequenceMode[0]);
 const alignModes = ["Exact", "Blast"] as const;
 const activeAlignMode = ref<(typeof alignModes)[number]>(alignModes[0]);
@@ -220,21 +224,12 @@ const loadingProgress = ref({
   value: 0,
 });
 
-function stringToArray(input: string): string[] {
-  if ((input.match(/\n/) || []).length == 0) {
-    return [input];
-  } else {
-    if (input.startsWith(">")) {
-      return extractSequencesFromFasta(input);
-    } else {
-      return input.split("\n");
-    }
-  }
-}
-
 const sequences = computed(() => {
-  if (sequence.value.startsWith(">")) {
-    return extractSequencesFromFasta(sequence.value);
+  if (sequence.value.startsWith(">") || sequence.value.startsWith("@")) {
+    return extractSequencesFromFasta(
+      sequence.value,
+      maxSequenceLengths[activeSequenceMode.value],
+    );
   } else if (sequence.value.length > 0) {
     if ((sequence.value.match(/\n/) || []).length == 0) {
       return [sequence.value];
@@ -242,7 +237,10 @@ const sequences = computed(() => {
       return sequence.value.split("\n");
     }
   } else if (sequenceFileContent.value.length > 0) {
-    return extractSequencesFromFasta(sequenceFileContent.value);
+    return extractSequencesFromFasta(
+      sequenceFileContent.value,
+      maxSequenceLengths[activeSequenceMode.value],
+    );
   } else {
     return [];
   }
@@ -258,7 +256,7 @@ const isValid = computed(() => {
   if (activeAlignMode.value === "Exact" && sequence.value.length > 0) {
     if (
       (activeSequenceMode.value === "Protein sequence(s)" &&
-        sequence.value.startsWith(">") &&
+        (sequence.value.startsWith(">") || sequence.value.startsWith("@")) &&
         validateInputArray(sequences.value, validateProtein)) ||
       (activeSequenceMode.value === "Protein sequence(s)" &&
         validateProtein(sequence.value))
@@ -266,7 +264,7 @@ const isValid = computed(() => {
       return { valid: true, error: "" };
     } else if (
       (activeSequenceMode.value === "Nucleotide sequence(s)" &&
-        sequence.value.startsWith(">") &&
+        (sequence.value.startsWith(">") || sequence.value.startsWith("@")) &&
         validateInputArray(sequences.value, validateDNA)) ||
       (activeSequenceMode.value === "Nucleotide sequence(s)" &&
         validateDNA(sequence.value))
@@ -318,6 +316,7 @@ function readTextFile(file: File) {
     file,
     (x: number) => (loadingProgress.value.value = Math.floor(x * 100)),
   ).then((buffer) => {
+    loadingProgress.value.title = "Processing file content...";
     return new Promise<string>((resolve) => {
       let decoder = new TextDecoder("utf-8");
       resolve(decoder.decode(buffer));
@@ -326,7 +325,7 @@ function readTextFile(file: File) {
 }
 
 function setFileSequence(content: string) {
-  loadingProgress.value.title = "Processing file content...";
+  console.log("Setting file content");
   sequenceFileContent.value = content;
   loading.value = false;
 }
@@ -363,9 +362,8 @@ const submit = () => {
       });
   } else if (activeSequenceMode.value === "Ids") {
     emit("search", {
-      mode: "exact",
-      sequences: sequences.value,
-      type: "dna", // TODO set to Ids
+      ids: sequences.value,
+      type: "id", // TODO set to Ids
     });
   }
 };
