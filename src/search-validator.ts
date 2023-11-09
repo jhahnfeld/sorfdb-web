@@ -1,6 +1,6 @@
 //const simple_dna: string[] = "acgtn".split("");
 const iupac_dna: string[] = "acgtmrwsykvhdbn".split("");
-const iupac_protein: string[] = "acdefghiklmnpqrstvwy".split("");
+const iupac_protein: string[] = "acdefghiklmnpqrstvwyuox".split(""); // added Selenocysteine and Pyrrolysine and X
 //const idRegex: RegExp = new RegExp('^(Genbank|SwissProt|UniProt|SmProt){1}\|(\w|\.)+\|(\w|\.)+$', 'g');
 
 const dna_alphabet: Set<string> = new Set([
@@ -50,6 +50,9 @@ function validateDNA(sequence: string): boolean {
 }
 
 function validateInputArray(input: string[], validator: Function): boolean {
+  if (input.length == 0) {
+    return false;
+  }
   return input.map((x) => validator(x)).every((b) => b === true);
 }
 
