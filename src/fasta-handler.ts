@@ -1,9 +1,12 @@
-function extractSequencesFromFasta(fastaString: string): string[] {
+function extractSequencesFromFasta(
+  fastaString: string,
+  maxLength: number,
+): string[] {
   const fastaAsArray: string[] = [];
   let header: string | null = null;
   let sequences: string[] = [];
   for (const line of fastaString.split("\n")) {
-    if (line.startsWith(">")) {
+    if (line.startsWith(">") || line.startsWith("@")) {
       if (header != null) {
         //fastaAsArray.push(header);
         fastaAsArray.push(sequences.join(""));
@@ -18,11 +21,11 @@ function extractSequencesFromFasta(fastaString: string): string[] {
     //fastaAsArray.push(header);
     fastaAsArray.push(sequences.join(""));
   }
-  return uniqueArray(fastaAsArray);
+  return uniqueArray(fastaAsArray).filter((x) => x.length <= maxLength);
 }
 
 function excludeFastaHeaders(fastaArray: string[]): string[] {
-  return fastaArray.filter((x) => !x.startsWith(">"));
+  return fastaArray.filter((x) => !x.startsWith(">") && !x.startsWith("@"));
 }
 
 function uniqueArray(array: Array<any>): Array<any> {
