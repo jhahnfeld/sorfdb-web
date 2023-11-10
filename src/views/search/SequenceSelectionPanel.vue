@@ -45,6 +45,7 @@
           placeholder="Paste your single nucleotide sequence or nucleotide sequences in FASTA format here.."
           aria-label="Paste your single nucleotide sequence or nucleotide sequences in FASTA format here.."
           autofocus="true"
+          :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
         <p>Example: ATGGAACTGACGGGGGACCCGGAGTGA or</p>
@@ -53,35 +54,15 @@
           ATGGAACTGACGGGGGACCCGGAGTGA
         </pre>
       </template>
-      <template
-        v-if="
-          activeSequenceMode === 'Nucleotide sequence(s)' ||
-          activeSequenceMode === 'Protein sequence(s)'
-        "
-      >
-        <div class="mb-2 pb-2">
-          <input
-            class="form-control"
-            type="file"
-            id="fastaFile"
-            @input="updateSequenceFile"
-            accept=".faa,.fas,.fna,.fasta,.faa.gz,.fna.gz,.fas.gz,.fasta.gz"
-          />
-        </div>
-        <progress-bar
-          v-if="loading"
-          :progress="loadingProgress"
-          :title="loadingProgress.title"
-        />
-      </template>
       <template v-if="activeSequenceMode === 'Ids'">
         <textarea
           class="form-control form-control-lg"
           type="text"
           v-model="sequence"
-          placeholder="Paste your Ids here (one Id per line)..."
+          placeholder="Paste your Ids here or upload them in a TXT file (one Id per line)..."
           aria-label="Paste your Ids here (one Id per line)..."
           autofocus="true"
+          :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
         <p>Examples:</p>
@@ -90,6 +71,20 @@
           GenBank|AABOTI020000010.1|MPA92906.1
         </pre>
       </template>
+      <div class="mb-2 pb-2">
+        <input
+          class="form-control"
+          type="file"
+          id="fastaFile"
+          @input="updateSequenceFile"
+          :accept="allowedFileTypes(activeSequenceMode)"
+        />
+      </div>
+      <progress-bar
+        v-if="loading"
+        :progress="loadingProgress"
+        :title="loadingProgress.title"
+      />
       <!--
         <h5 class="mb-2">Search mode:</h5>
         <div
@@ -224,6 +219,14 @@ const loadingProgress = ref({
   value: 0,
 });
 
+function allowedFileTypes(mode: string): string {
+  if (mode == "Ids") {
+    return ".txt";
+  } else {
+    return ".faa,.fas,.fna,.fasta,.faa.gz,.fna.gz,.fas.gz,.fasta.gz";
+  }
+}
+
 const sequences = computed(() => {
   if (sequence.value.startsWith(">") || sequence.value.startsWith("@")) {
     return extractSequencesFromFasta(
@@ -234,13 +237,21 @@ const sequences = computed(() => {
     if ((sequence.value.match(/\n/) || []).length == 0) {
       return [sequence.value];
     } else {
-      return sequence.value.split("\n");
+      return uniqueArray(sequence.value.split("\n")).filter(
+        (x) => x.length > 0,
+      );
     }
   } else if (sequenceFileContent.value.length > 0) {
-    return extractSequencesFromFasta(
-      sequenceFileContent.value,
-      maxSequenceLengths[activeSequenceMode.value],
-    );
+    if (sequenceFileContent.value.startsWith(">")) {
+      return extractSequencesFromFasta(
+        sequenceFileContent.value,
+        maxSequenceLengths[activeSequenceMode.value],
+      );
+    } else {
+      return uniqueArray(sequenceFileContent.value.split("\n")).filter(
+        (x) => x.length > 0,
+      );
+    }
   } else {
     return [];
   }
@@ -296,6 +307,11 @@ const isValid = computed(() => {
       validateInputArray(sequences.value, validateDNA)
     ) {
       return { valid: true, error: "" };
+    } else if (
+      activeSequenceMode.value === "Ids" &&
+      validateInputArray(sequences.value, matchesIdScheme)
+    ) {
+      return { valid: true, error: "" };
     } else {
       return {
         valid: false,
@@ -310,7 +326,7 @@ const isValid = computed(() => {
   };
 });
 
-function readTextFile(file: File) {
+function readTextFile(file: File): Promise<string> {
   loading.value = true;
   return readFileWithProgress(
     file,
@@ -324,13 +340,12 @@ function readTextFile(file: File) {
   });
 }
 
-function setFileSequence(content: string) {
-  console.log("Setting file content");
+function setFileSequence(content: string): void {
   sequenceFileContent.value = content;
   loading.value = false;
 }
 
-function updateSequenceFile(evt: Event) {
+function updateSequenceFile(evt: Event): void {
   if (evt.target instanceof HTMLInputElement && evt.target.files) {
     sequenceFile.value = evt.target.files.item(0);
     if (sequenceFile.value === null) {
