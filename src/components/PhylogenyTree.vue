@@ -30,15 +30,17 @@ const mapping: Record<string, string> = {
 };
 
 type TreeEntry = {
-  url: string;
+  url: string | undefined;
   level: string;
   label: string;
 };
 
 function toEntry(level: string, value: string): TreeEntry {
-  if (!(level in mapping)) throw `Unsupported taxonomy level: ${level}`;
   return {
-    url: "https://gtdb.ecogenomic.org/tree?r=" + mapping[level] + value,
+    url:
+      level in mapping
+        ? "https://gtdb.ecogenomic.org/tree?r=" + mapping[level] + value
+        : undefined,
     level: level,
     label: value,
   };
@@ -53,8 +55,11 @@ const entries = computed(() => {
     toEntry("order", c.order ? c.order : ""),
     toEntry("family", c.family ? c.family : ""),
     toEntry("genus", c.genus ? c.genus : ""),
-    toEntry("species", c.species ? c.species : ""),
-    toEntry("strain", c.strain ? c.strain : ""),
+    toEntry(
+      "species",
+      c.species.length > 0 ? c.species : c.strain.length > 0 ? c.strain : "",
+    ),
+    toEntry("strain", c.species.length > 0 ? c.strain : ""),
   ];
 });
 </script>

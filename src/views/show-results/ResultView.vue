@@ -1,4 +1,3 @@
-<!-- eslint-disable prettier/prettier -->
 <script setup lang="ts">
 import Loading from "@/components/Loading.vue";
 import usePageState, { State } from "@/PageState";
@@ -6,6 +5,7 @@ import { computed, onMounted, ref } from "vue";
 
 import { useApi } from "@/SorfdbApi";
 import { useRoute } from "vue-router";
+import SummaryPane from "@/views/show-results/SummaryPane.vue";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 
 const route = useRoute();
@@ -29,9 +29,11 @@ state.value.setState(State.Loading);
 <template>
   <main class="container">
     <div class="row">
-      <h2>Dataset: {{ id }}</h2>
+      <h2>Entry: {{ id }}</h2>
     </div>
-    <Loading :state="state"> {{ entry }}</Loading>
+    <Loading :state="state">
+      <SummaryPane :id="id" :entry="entry" />
+    </Loading>
   </main>
 </template>
 @/SorfdbApi
