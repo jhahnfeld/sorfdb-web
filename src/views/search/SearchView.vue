@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type PaginationData } from "@/components/pagination/Pagination";
 import type {
-  CompoundQuery,
+  InQuery,
   SearchInfo,
   SortDirection,
   SortOption,
@@ -20,7 +20,7 @@ import SequenceSelectionPanel from "./SequenceSelectionPanel.vue";
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
-const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
+const query: Ref<InQuery | undefined> = ref();
 
 const api = shallowRef(useApi());
 const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });
@@ -44,9 +44,10 @@ function updateOrdering(sortkey: string, direction: SortDirection | null) {
 function search(offset = 0) {
   searchState.value.setState(State.Loading);
   if (resultsPanel.value) resultsPanel.value.resetTsvExport();
+  if (query.value == undefined) return;
   api.value
     .search({
-      query: unref(query),
+      query: query.value,
       sort: ordering.value,
       offset: offset,
       limit: pagination.value.limit,
@@ -62,26 +63,23 @@ function search(offset = 0) {
 
 function _search(req: SequenceSearchRequest) {
   if (req.type === "protein" && req.mode === "exact") {
-    const clauses = req.sequences.map((s) => ({
+    query.value = {
       field: "protein",
-      op: "==",
-      value: s,
-    }));
-    query.value = { op: "or", value: clauses };
+      op: "in",
+      value: req.sequences,
+    };
   } else if (req.type === "dna" && req.mode === "exact") {
-    const clauses = req.sequences.map((s) => ({
+    query.value = {
       field: "sorf",
-      op: "==",
-      value: s,
-    }));
-    query.value = { op: "or", value: clauses };
+      op: "in",
+      value: req.sequences,
+    };
   } else if (req.type === "id") {
-    const clauses = req.ids.map((s) => ({
+    query.value = {
       field: "id",
-      op: "==",
-      value: s,
-    }));
-    query.value = { op: "or", value: clauses };
+      op: "in",
+      value: req.ids,
+    };
   }
   search();
 }
@@ -125,6 +123,7 @@ onMounted(init);
     />
     <ResultsPanel
       ref="resultsPanel"
+      v-if="query"
       :api="api"
       :all-columns="allColumns"
       :entries="entries"
