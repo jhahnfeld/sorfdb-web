@@ -3,6 +3,7 @@ import type { PropType } from "vue";
 import DisplayMetadata from "./DisplayMetadata.vue";
 import PhylogenyTree from "@/components/PhylogenyTree.vue";
 import PsosPanel from "./PsosPanel.vue";
+import SequenceFeatures from "./SequenceFeatures.vue";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 
 const props = defineProps({
@@ -31,13 +32,21 @@ const props = defineProps({
     </div>
   </div>
   <div class="row my-3 gx-2 gy-2">
-    <div class="col-lg-6 col-md-12">
+    <div class="col-lg-4 col-md-12">
       <div class="card h-100">
         <div class="card-header">Protein sequence observation service PSOS</div>
         <div class="card-body">
-          PSOS provides up-to-date analysis tools and databases for the analysis
-          of protein sequences, such as DbXrefs.
+          PSOS provides analysis tools and databases for the more comprehensive
+          analysis of protein sequences, such as DbXrefs.
           <PsosPanel :entry="entry" />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8 col-md-12">
+      <div class="card h-100">
+        <div class="card-header">Sequence features</div>
+        <div class="card-body">
+          <SequenceFeatures :entry="entry" />
         </div>
       </div>
     </div>
