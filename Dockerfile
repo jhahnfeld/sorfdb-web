@@ -2,7 +2,7 @@ FROM node:current-alpine3.18 as builder
 
 COPY . /src
 WORKDIR /src
-RUN apk update && npm install
+RUN apk update && npm install --omit=dev
 RUN npm run build-only --omit=dev
 
 FROM nginx:alpine3.18-slim
