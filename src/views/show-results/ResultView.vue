@@ -32,7 +32,7 @@ state.value.setState(State.Loading);
       <h2>Entry: {{ id }}</h2>
     </div>
     <Loading :state="state">
-      <SummaryPane :id="id" :entry="entry" />
+      <SummaryPane v-if="entry" :id="id" :entry="entry" />
     </Loading>
   </main>
 </template>
