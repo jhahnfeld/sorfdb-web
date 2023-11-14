@@ -35,7 +35,13 @@ function passOrdering(sortkey: string, newdirection: SortDirection | null) {
 function extractValue(entry: SorfdbEntry, c: Option) {
   const tmp = entry as Record<string, unknown>;
   const val = tmp[c.key];
-  if (!val) return "?";
+  if (c.key == "rbs") {
+    if (val != 0 && val != 1) {
+      return "?";
+    }
+  } else if (!val) {
+    return "?";
+  }
   return val;
 }
 </script>
