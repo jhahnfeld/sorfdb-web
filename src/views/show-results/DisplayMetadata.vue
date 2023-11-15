@@ -33,7 +33,11 @@ function accessionUrl(accession: string, source: string): string | undefined {
 }
 function proteinIdUrl(proteinId: string, source: string): string | undefined {
   if (source == "GenBank") {
-    return "https://www.ncbi.nlm.nih.gov/protein/".concat(proteinId);
+    if (proteinId.startsWith("sORF_")) {
+      return undefined;
+    } else {
+      return "https://www.ncbi.nlm.nih.gov/protein/".concat(proteinId);
+    }
   } else if (source == "SmProt") {
     return "http://bigdata.ibp.ac.cn/SmProt/keyword.htm";
   } else {
