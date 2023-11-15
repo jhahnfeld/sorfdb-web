@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import json5 from "json5";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
+import { psosResponseScheme, type psosResponse } from "@/model/PsosResponse";
 import notificationMessage from "@/components/Notification.vue";
 import { ref, type PropType } from "vue";
 const props = defineProps({
@@ -8,43 +9,15 @@ const props = defineProps({
   entry: { type: Object as PropType<SorfdbEntry>, required: true },
 });
 const error = ref("");
-const psosResponse = ref(undefined);
-const psosId = ref("");
 
-interface psosResponse {
-  id: string;
-  created: string;
-  lastUpdated: string;
-  deleteAt: string;
-  step: string;
-  request: {
-    type: string;
-    configuration: {
-      profile: string;
-    };
-    sequence: string;
-  };
-  files: [
-    {
-      location: string;
-      name: string;
-      type: string;
-    },
-  ];
-  state: {
-    name: string;
-    type: string;
-  };
-}
-
-function toJson(r: Response): Promise<JSON> {
+function toJson(r: Response) {
   if (!r.ok)
     return r
       .text()
       .then((t) => Promise.reject(`${r.status}: ${r.statusText}\n${t}`));
   return r.text().then(json5.parse);
 }
-function sendPsosRequest(protein: string): psosResponse {
+async function sendPsosRequest(protein: string) {
   const headers: Headers = new Headers();
   headers.set("Content-Type", "application/json");
   headers.set("Accept", "application/json");
@@ -59,23 +32,28 @@ function sendPsosRequest(protein: string): psosResponse {
       }),
     },
   );
-
-  fetch(request)
-    .then((x) => {
-      return toJson(x);
-    })
-    .catch((error) => {
-      console.error("Promise rejected with error: " + error);
-    });
-  fetch(request).then((x) => {
-    return toJson(x);
-  });
+  try {
+    const response = await fetch(request);
+    const responseBody = await toJson(response);
+    return responseBody;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
+  //return fetch(request).then((x) => {
+  //  return toJson(x);
+  //});
+  //.then((j) => psosResponseScheme.parse(j));
 }
-function getPsosId(protein: string) {
-  const psosJson = sendPsosRequest(protein);
-  //psosId.value = psosJson;
-  console.log(psosJson);
-  console.log(psosId.value);
+async function getPsosId(protein: string) {
+  const psosJson = await sendPsosRequest(protein);
+  console.log(psosJson.id);
+  return psosJson.id;
+}
+
+async function openPsos(protein: string) {
+  const psosId = await getPsosId(protein);
+  window.open("https://psos.computational.bio/psov2/".concat(psosId));
 }
 </script>
 
@@ -84,7 +62,7 @@ function getPsosId(protein: string) {
     <button
       type="button"
       class="btn btn-primary"
-      @click="getPsosId(entry.protein)"
+      @click="openPsos(entry.protein)"
     >
       Send to PSOS
     </button>
