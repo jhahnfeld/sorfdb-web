@@ -35,6 +35,7 @@ const SorfdbEntrySchema = z.object({
   "isoelectric-point": z.number(),
   "aliphatic-index": z.number(),
   boman: z.number(),
+  "cluster-id": z.optional(z.string()),
 });
 const SorfdbSearchResultSchema = z.object({
   offset: z.optional(z.number()),
