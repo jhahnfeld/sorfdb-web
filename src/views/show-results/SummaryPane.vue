@@ -5,6 +5,7 @@ import PhylogenyTree from "@/components/PhylogenyTree.vue";
 import PsosPanel from "./PsosPanel.vue";
 import SequenceFeatures from "./SequenceFeatures.vue";
 import ProteinDescriptors from "./ProteinDescriptors.vue";
+import PfamHits from "./PfamHits.vue";
 import SequencePane from "./SequencePane.vue";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 
@@ -52,16 +53,6 @@ function copyToClipboard(text: string): void {
         </div>
       </div>
     </div>
-    <div class="col-lg-8 col-md-12">
-      <div class="card h-100">
-        <div class="card-header">Sequence features</div>
-        <div class="card-body">
-          <SequenceFeatures :entry="entry" />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row my-3 gx-2 gy-2">
     <div class="col-lg-4 col-md-12">
       <div class="card h-100">
         <div class="card-header">Sequence features</div>
@@ -72,11 +63,19 @@ function copyToClipboard(text: string): void {
     </div>
     <div class="col-lg-4 col-md-12">
       <div class="card h-100">
-        <div class="card-header">Protein sequence observation service PSOS</div>
+        <div class="card-header">Pfam hits</div>
         <div class="card-body">
-          PSOS provides analysis tools and databases for the more comprehensive
-          analysis of protein sequences, such as DbXrefs.
-          <PsosPanel :entry="entry" />
+          <PfamHits :entry="entry" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row my-3 gx-2 gy-2">
+    <div class="col-lg-12 col-md-12">
+      <div class="card h-100">
+        <div class="card-header">Sequence features</div>
+        <div class="card-body">
+          <SequenceFeatures :entry="entry" />
         </div>
       </div>
     </div>
@@ -86,10 +85,42 @@ function copyToClipboard(text: string): void {
       <div class="card h-100">
         <div class="card-header">
           Protein sequence
+          <span class="float-end">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="copyToClipboard(entry.protein)"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-clipboard"
+                viewBox="0 0 16 16"
+              >
+                <path :d="clipBoardPath1" />
+                <path :d="clipBoardPath2" />
+              </svg>
+            </button>
+          </span>
+        </div>
+        <div class="card-body">
+          <SequencePane :entry="entry" keyword="protein" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row my-3 gx-2 gy-2"></div>
+  <div class="col-lg-12 col-md-12">
+    <div class="card h-100">
+      <div class="card-header">
+        Nucleotide sequence
+        <span class="float-end">
           <button
             type="button"
             class="btn btn-secondary"
-            @click="copyToClipboard(entry.protein)"
+            @click="copyToClipboard(entry.sorf)"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,35 +134,7 @@ function copyToClipboard(text: string): void {
               <path :d="clipBoardPath2" />
             </svg>
           </button>
-        </div>
-        <div class="card-body">
-          <SequencePane :entry="entry" keyword="protein" />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row my-3 gx-2 gy-2"></div>
-  <div class="col-lg-12 col-md-12">
-    <div class="card h-100">
-      <div class="card-header">
-        Nucleotide sequence
-        <button
-          type="button"
-          class="btn btn-secondary"
-          @click="copyToClipboard(entry.sorf)"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-clipboard"
-            viewBox="0 0 16 16"
-          >
-            <path :d="clipBoardPath1" />
-            <path :d="clipBoardPath2" />
-          </svg>
-        </button>
+        </span>
       </div>
       <div class="card-body">
         <SequencePane :entry="entry" keyword="sorf" />
