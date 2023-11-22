@@ -2,14 +2,13 @@ function extractSequencesFromFasta(
   fastaString: string,
   maxLength: number,
 ): string[] {
-  const fastaAsArray: string[] = [];
+  const fastaSet: Set<string> = new Set();
   let header: string | null = null;
   let sequences: string[] = [];
   for (const line of fastaString.split("\n")) {
     if (line.startsWith(">") || line.startsWith("@")) {
       if (header != null) {
-        //fastaAsArray.push(header);
-        fastaAsArray.push(sequences.join(""));
+        fastaSet.add(sequences.join(""));
         sequences = [];
       }
       header = line;
@@ -18,18 +17,13 @@ function extractSequencesFromFasta(
     }
   }
   if (header != null && sequences.length > 0) {
-    //fastaAsArray.push(header);
-    fastaAsArray.push(sequences.join(""));
+    fastaSet.add(sequences.join(""));
   }
-  return uniqueArray(fastaAsArray).filter((x) => x.length <= maxLength);
-}
-
-function excludeFastaHeaders(fastaArray: string[]): string[] {
-  return fastaArray.filter((x) => !x.startsWith(">") && !x.startsWith("@"));
+  return [...fastaSet].filter((x) => x.length <= maxLength);
 }
 
 function uniqueArray(array: Array<any>): Array<any> {
   return [...new Set(array)];
 }
 
-export { extractSequencesFromFasta, excludeFastaHeaders, uniqueArray };
+export { extractSequencesFromFasta, uniqueArray };
