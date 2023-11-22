@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import json5 from "json5";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 import { psosResponseScheme, type psosResponse } from "@/model/PsosResponse";
+import { toJson } from "@/util";
 import notificationMessage from "@/components/Notification.vue";
 import { ref, type PropType } from "vue";
 const props = defineProps({
@@ -10,13 +10,6 @@ const props = defineProps({
 });
 const error = ref("");
 
-function toJson(r: Response) {
-  if (!r.ok)
-    return r
-      .text()
-      .then((t) => Promise.reject(`${r.status}: ${r.statusText}\n${t}`));
-  return r.text().then(json5.parse);
-}
 async function sendPsosRequest(protein: string) {
   const headers: Headers = new Headers();
   headers.set("Content-Type", "application/json");
