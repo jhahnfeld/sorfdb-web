@@ -26,4 +26,12 @@ function uniqueArray(array: Array<any>): Array<any> {
   return [...new Set(array)];
 }
 
-export { extractSequencesFromFasta, uniqueArray };
+function fastaFromSequences(seqs: string[]): string {
+  let fasta: string = "";
+  for (let i = 0; i < seqs.length; i++) {
+    fasta += ">".concat(i.toString(), "\n", seqs[i], "\n");
+  }
+  return fasta;
+}
+
+export { extractSequencesFromFasta, fastaFromSequences, uniqueArray };
