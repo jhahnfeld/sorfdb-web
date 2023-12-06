@@ -47,7 +47,7 @@ const props = defineProps({
         </td>
       </tr>
       <tr>
-        <th class="text-end">Instability:</th>
+        <th class="text-end">Instability index:</th>
         <td class="ps-5">
           {{ entry.instability }}
           <i
@@ -71,7 +71,7 @@ const props = defineProps({
         </td>
       </tr>
       <tr>
-        <th class="text-end">Aliphatic-index:</th>
+        <th class="text-end">Aliphatic index:</th>
         <td class="ps-5">
           {{ entry["aliphatic-index"] }}
           <i
