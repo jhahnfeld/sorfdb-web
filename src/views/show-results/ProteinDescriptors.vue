@@ -83,7 +83,7 @@ const props = defineProps({
         </td>
       </tr>
       <tr>
-        <th class="text-end">Boman:</th>
+        <th class="text-end">Boman index:</th>
         <td class="ps-5">
           {{ entry.boman }}
           <i
