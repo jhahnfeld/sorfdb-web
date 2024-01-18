@@ -1,9 +1,11 @@
 import { z } from "zod";
 
-const PfamEntryScheme = z.object({
-  name: z.string(),
-  evalue: z.number(),
-});
+const PfamEntryScheme = z.array(
+  z.object({
+    name: z.string(),
+    evalue: z.number(),
+  }),
+);
 
 const SorfdbEntrySchema = z.object({
   id: z.string(),
@@ -27,7 +29,7 @@ const SorfdbEntrySchema = z.object({
   plen: z.number(),
   product: z.string(),
   rbs: z.nullable(z.number()),
-  "pfam-hits": z.array(PfamEntryScheme),
+  "pfam-hits": PfamEntryScheme,
   gravy: z.number(),
   aromaticity: z.number(),
   "molecular-weight": z.number(),
@@ -46,7 +48,8 @@ const SorfdbSearchResultSchema = z.object({
   results: z.array(SorfdbEntrySchema),
 });
 
+export type PfamEntry = z.infer<typeof PfamEntryScheme>;
 export type SorfdbEntry = z.infer<typeof SorfdbEntrySchema>;
 export type SorfdbSearchResult = z.infer<typeof SorfdbSearchResultSchema>;
 
-export { SorfdbEntrySchema, SorfdbSearchResultSchema };
+export { PfamEntryScheme, SorfdbEntrySchema, SorfdbSearchResultSchema };
