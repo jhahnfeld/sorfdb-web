@@ -105,7 +105,10 @@ export type SearchInfoLeaf = {
   ops: string[];
   type: "text" | "number";
   sortable: boolean;
+  min: number;
+  max: number;
 };
+
 export type SearchInfoNested = {
   field: string;
   fields: SearchInfoField[];
