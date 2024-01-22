@@ -46,11 +46,6 @@ const exportInProgress = ref(false);
 
 const allColumns = ref<Option[]>(resultTableColums());
 
-export type Range = {
-  from: number;
-  to: number;
-};
-
 function encodeQuery(): string {
   return btoa(JSON.stringify({ query: query.value, ordering: ordering.value }));
 }

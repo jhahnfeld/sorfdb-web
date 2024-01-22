@@ -9,8 +9,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Range } from "@/views/browse/BrowseView.vue";
 import { computed, type PropType } from "vue";
+
+export type Range = {
+  from: number;
+  to: number;
+};
 
 const props = defineProps({
   label: { type: String, required: true },
