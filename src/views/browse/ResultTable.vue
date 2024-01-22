@@ -24,11 +24,6 @@ const emit = defineEmits<{
   (e: "update:ordering", key: string, direction: SortDirection | null): void;
 }>();
 
-// function gc(entry: BakrepSearchResultEntry): string {
-//   if (!entry.bakta) return "?";
-//   return (entry.bakta.stats.gc * 100).toFixed(2) + " %";
-// }
-
 function passOrdering(sortkey: string, newdirection: SortDirection | null) {
   emit("update:ordering", sortkey, newdirection);
 }
@@ -46,7 +41,7 @@ function extractValue(entry: SorfdbEntry, c: Option) {
     if ((val as PfamEntry).length == 0) {
       return "-";
     } else {
-      return constructPfamEntries(val as PfamEntry); // TODO format Pfam entries
+      return constructPfamEntries(val as PfamEntry);
     }
   }
   return val;
