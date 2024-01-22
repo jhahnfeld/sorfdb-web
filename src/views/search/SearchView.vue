@@ -9,26 +9,69 @@ import type {
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 import usePageState, { State } from "@/PageState";
 import { useApi } from "@/SorfdbApi";
-import { onMounted, shallowRef, unref } from "vue";
-
+import { onMounted, shallowRef } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import type { Option } from "@/components/CheckboxOption";
-import { ref, type Ref } from "vue";
+import { ref, type Ref, watch } from "vue";
 import { resultTableColums } from "../browse/ResultColumns";
 import ResultsPanel from "../browse/ResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
 import SequenceSelectionPanel from "./SequenceSelectionPanel.vue";
+
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
 const query: Ref<InQuery | undefined> = ref();
 
 const api = shallowRef(useApi());
+const route = useRoute();
+const router = useRouter();
 const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });
 const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
 const exportInProgress = ref(false);
 
 const allColumns = ref<Option[]>(resultTableColums());
 const resultsPanel = ref<typeof ResultsPanel>();
+
+function encodeQuery(): string {
+  return btoa(JSON.stringify({ query: query.value, ordering: ordering.value }));
+}
+
+function decodeQuery(encodedQuery: string): {
+  query: InQuery;
+  ordering: SortOption[];
+} {
+  return JSON.parse(atob(encodedQuery));
+}
+
+function populateVariables() {
+  if (route.query.query) {
+    const decodedQuery = decodeQuery(route.query.query as string);
+    query.value = decodedQuery.query;
+    ordering.value = decodedQuery.ordering;
+    pagination.value.offset = Number.parseInt(route.query.offset as string);
+    pagination.value.limit = Number.parseInt(route.query.limit as string);
+    search(pagination.value.offset);
+  }
+}
+
+watch(
+  () => route.query,
+  () => {
+    populateVariables();
+  },
+);
+
+function updateQuery(offset = 0) {
+  router.push({
+    name: "search",
+    query: {
+      offset: offset,
+      limit: pagination.value.limit,
+      query: encodeQuery(),
+    },
+  });
+}
 
 function updateOrdering(sortkey: string, direction: SortDirection | null) {
   const idx = ordering.value.findIndex((s) => s.field === sortkey);
@@ -41,6 +84,7 @@ function updateOrdering(sortkey: string, direction: SortDirection | null) {
   }
   search();
 }
+
 function search(offset = 0) {
   searchState.value.setState(State.Loading);
   if (resultsPanel.value) resultsPanel.value.resetTsvExport();
@@ -57,6 +101,7 @@ function search(offset = 0) {
       searchState.value.setState(State.Main);
       if (r.offset) pagination.value.offset = r.offset;
       pagination.value.total = r.total;
+      updateQuery(r.offset);
     })
     .catch((err) => pageState.value.setError(err));
 }
@@ -110,6 +155,7 @@ function init() {
       updateAllColumns(r);
       pageState.value.setState(State.Main);
     })
+    .then(populateVariables)
     .catch((err) => pageState.value.setError(err));
 }
 onMounted(init);
@@ -132,7 +178,7 @@ onMounted(init);
       :query="query"
       :search-state="searchState"
       :export-in-progress="exportInProgress"
-      @search="search"
+      @search="updateQuery"
       @update:ordering="updateOrdering"
       @update:exportInProgress="(e) => (exportInProgress = e)"
     />
