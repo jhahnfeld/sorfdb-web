@@ -233,7 +233,7 @@ function allowedFileTypes(mode: string): string {
   }
 }
 
-const sequences = computed(() => {
+const sequences = computed<string[]>(() => {
   if (sequence.value.startsWith(">") || sequence.value.startsWith("@")) {
     return extractSequencesFromFasta(
       sequence.value,
@@ -267,6 +267,22 @@ const sequences = computed(() => {
 });
 
 const isValid = computed(() => {
+  console.log(sequences.value.length);
+  console.log(new Blob(sequences.value).size / (1024 * 1024));
+  if (new Blob(sequences.value).size / (1024 * 1024) >= 46) {
+    return {
+      valid: false,
+      error:
+        "The sequence search is limited to 50MB. Please perform a local search. Small proteins, sORFs and HMMs for small protein families are available in the Download tab. Recommended BLAST parameters are available in the FAQ.",
+    };
+  }
+  if (sequences.value.length > 50000000) {
+    return {
+      valid: false,
+      error:
+        "The sequence search is limited to 50,000,000 sequences. Please perform a local search. Small proteins, sORFs and HMMs for small protein families are available in the Download tab. Recommended BLAST parameters are available in the FAQ.",
+    };
+  }
   if (sequence.value.length > 0 && sequenceFile.value != null) {
     return {
       valid: false,
