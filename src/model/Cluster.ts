@@ -3,6 +3,7 @@ type Cluster = {
   statistics: {
     sequenceCount: number;
     averageSequenceLength: number;
+    MedianSequenceLength: number;
     taxonomy: FlatTree;
   };
   function: string;
