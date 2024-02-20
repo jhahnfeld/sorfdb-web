@@ -3,7 +3,12 @@
 <template>
   <div class="page-body flex-grow-1 container">
     <h2>FAQ</h2>
-    If you have a question you can ask it here Github link.
+    If you have a question you can ask it at
+    <a href="https://github.com/jhahnfeld/sorfdb-web" target="_blank">GitHub</a>
+    or send a mail to
+    <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
+      >sorfdb@computational.bio.uni-giessen.de</a
+    >.
     <div class="accordion accordion-flush" id="accordionExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
@@ -25,9 +30,10 @@
           data-bs-parent="#accordionExample"
         >
           <div class="accordion-body">
-            Morbi non dui tristique, porttitor tellus vitae, dapibus risus.
-            Suspendisse eros erat, rhoncus sit amet lobortis vel, lacinia
-            fermentum tortor. Sed nec pellentesque urna.
+            If you are looking for sORF or small protein database for bacteria
+            you will find in sORFdb a comprehensive, taxonomy independent and
+            quality-filtered database with web based search and browse functions
+            as well as downloadable sequence and small protein family data.
           </div>
         </div>
       </div>
@@ -52,9 +58,12 @@
           data-bs-parent="#accordionExample"
         >
           <div class="accordion-body">
-            Morbi non dui tristique, porttitor tellus vitae, dapibus risus.
-            Suspendisse eros erat, rhoncus sit amet lobortis vel, lacinia
-            fermentum tortor. Sed nec pellentesque urna.
+            If you cannot find your protein with the exact search you can use
+            the BLAST based search which allows you to specify identity and
+            coverage thresholds. Alternatively, you can use the HMM based small
+            protein family search. If all searches do not include your protein
+            it is highly likely not present in the current version of the
+            database.
           </div>
         </div>
       </div>
@@ -77,31 +86,32 @@
           class="accordion-collapse collapse"
           aria-labelledby="headingThree"
           data-bs-parent="#accordionExample"
+          Three
         >
           <div class="accordion-body">
-            Morbi non dui tristique, porttitor tellus vitae, dapibus risus.
-            Suspendisse eros erat, rhoncus sit amet lobortis vel, lacinia
-            fermentum tortor. Sed nec pellentesque urna.
+            You can use the HMMs of the small protein families to identify small
+            proteins or you can use the sequence data for a sequence search i.e.
+            with BLAST.
           </div>
         </div>
       </div>
       <div class="accordion-item">
-        <h2 class="accordion-header" id="headingThree">
+        <h2 class="accordion-header" id="headingFour">
           <button
             class="accordion-button collapsed"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#collapseThree"
+            data-bs-target="#collapseFour"
             aria-expanded="false"
-            aria-controls="collapseThree"
+            aria-controls="collapseFour"
           >
             4. What are the recommended BLAST parameters?
           </button>
         </h2>
         <div
-          id="collapseThree"
+          id="collapseFour"
           class="accordion-collapse collapse"
-          aria-labelledby="headingThree"
+          aria-labelledby="headingFour"
           data-bs-parent="#accordionExample"
         >
           <div class="accordion-body">
