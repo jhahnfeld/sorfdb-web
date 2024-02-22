@@ -16,8 +16,18 @@ const router = createRouter({
       component: () => import("../views/search/SearchView.vue"),
     },
     {
+      path: "/search/:tab",
+      name: "search-tab",
+      component: () => import("../views/search/SearchView.vue"),
+    },
+    {
       path: "/browse",
       name: "browse",
+      component: () => import("../views/browse/BrowseView.vue"),
+    },
+    {
+      path: "/browse/:tab",
+      name: "browse-tab",
       component: () => import("../views/browse/BrowseView.vue"),
     },
     {

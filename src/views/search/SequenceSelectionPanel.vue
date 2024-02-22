@@ -1,8 +1,5 @@
 <template>
   <div class="container page-body flex-grow-1 mb-2">
-    <div class="row">
-      <h2>Sequence search</h2>
-    </div>
     <ul class="nav nav-underline">
       <li class="nav-item">
         <span class="nav-link disabled">Search by</span>
@@ -31,7 +28,7 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p>Examples: MRTGNAN or</p>
+        <p style="margin-top: 1em">Examples: MRTGNAN or</p>
         <pre>
           >SwissProt|Q47505|MCCC7_ECOLX
           MRTGNAN
@@ -48,7 +45,7 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p>Example: ATGGAACTGACGGGGGACCCGGAGTGA or</p>
+        <p style="margin-top: 1em">Example: ATGGAACTGACGGGGGACCCGGAGTGA or</p>
         <pre>
           >MyDnaSequence
           ATGGAACTGACGGGGGACCCGGAGTGA
@@ -65,7 +62,7 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p>Examples:</p>
+        <p style="margin-top: 1em">Examples:</p>
         <pre>
           SwissProt|Q47505|MCCC7_ECOLX
           GenBank|AABOTI020000010.1|MPA92906.1
@@ -104,7 +101,7 @@
           </label>
         </div>        
       -->
-      <ul class="nav nav-underline">
+      <ul class="nav nav-underline" style="margin-top: 1em">
         <li class="nav-item">
           <span class="nav-link disabled">Search mode</span>
         </li>
@@ -267,8 +264,6 @@ const sequences = computed<string[]>(() => {
 });
 
 const isValid = computed(() => {
-  console.log(sequences.value.length);
-  console.log(new Blob(sequences.value).size / (1024 * 1024));
   if (new Blob(sequences.value).size / (1024 * 1024) >= 46) {
     return {
       valid: false,

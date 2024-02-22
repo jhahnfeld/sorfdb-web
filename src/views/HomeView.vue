@@ -17,7 +17,7 @@
       </h3>
     </div>
 
-    <div class="container-fluid">
+    <div class="container-fluid" style="margin-top: 2em">
       <div class="row">
         <div class="col-xs-12 col-md-4"></div>
         <div class="col-xs-12 col-md-4">
@@ -29,9 +29,7 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-4">
-          <h2 style="text-align: center; margin-top: 1em">
-            sORF & small protein sequences
-          </h2>
+          <h2 style="text-align: center; margin-top: 1em">Sequences</h2>
         </div>
         <div class="col-xs-12 col-md-4">
           <h2 style="text-align: center; margin-top: 1em">
@@ -56,14 +54,12 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-4">
-          <h2 style="text-align: center; margin-top: 1em">
-            Small protein families
-          </h2>
+          <h2 style="text-align: center; margin-top: 1em">Families</h2>
         </div>
         <div class="col-xs-12 col-md-4">
           <h2 style="text-align: center; margin-top: 1em">
             <router-link
-              to="/search"
+              to="/search/family"
               style="color: black; text-decoration: none"
             >
               Icon3
@@ -73,7 +69,7 @@
         <div class="col-xs-12 col-md-4">
           <h2 style="text-align: center; margin-top: 1em">
             <router-link
-              to="/browse"
+              to="/browse/family"
               style="color: black; text-decoration: none"
             >
               Icon4
@@ -129,7 +125,7 @@
     </div>
     -->
 
-    <h3 style="margin-top: 2em">About sORFdb</h3>
+    <h3 style="margin-top: 3em">About sORFdb</h3>
     <p style="text-align: justify">
       sORFdb is a the first dedicated database for small open reading frames
       (sORFs) and small proteins as well as their functions in bacteria of
