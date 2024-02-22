@@ -9,7 +9,11 @@
     <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
       >sorfdb@computational.bio.uni-giessen.de</a
     >.
-    <div class="accordion accordion-flush" id="accordionExample">
+    <div
+      style="margin-top: 1em"
+      class="accordion accordion-flush"
+      id="accordionExample"
+    >
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
           <button
