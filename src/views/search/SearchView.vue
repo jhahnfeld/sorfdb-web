@@ -175,7 +175,7 @@ onMounted(init);
       />
     </template>
     <template v-if="active_tab === 'family'">
-      <h2>FOOOOOOOOOO</h2>
+      <h2>WIP</h2>
       <ResultsPanel
         ref="resultsPanel"
         v-if="query"
