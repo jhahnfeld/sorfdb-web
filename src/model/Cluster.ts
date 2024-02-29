@@ -12,6 +12,7 @@ type Cluster = {
 
 type TreeNode = {
   id: string;
+  rank: string;
   label: string;
   value: number;
   parent: string | undefined;
