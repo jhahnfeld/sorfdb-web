@@ -5,7 +5,8 @@ function extractSequencesFromFasta(
   const fastaSet: Set<string> = new Set();
   let header: string | null = null;
   let sequences: string[] = [];
-  for (const line of fastaString.split("\n")) {
+  for (let line of fastaString.split("\n")) {
+    line = line.trim();
     if (line.startsWith(">") || line.startsWith("@")) {
       if (header != null) {
         fastaSet.add(sequences.join(""));
