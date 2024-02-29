@@ -78,66 +78,20 @@
         </div>
       </div>
     </div>
-    <!--
-    <div class="row">
-      <div class="col">
-        <h2 style="text-align: center; margin-top: 1em">
-          <router-link to="/search" style="color: black; text-decoration: none">
-            Search
-          </router-link>
-        </h2>
-        <h4 style="text-align: center">
-          <router-link to="/search" style="color: gray; text-decoration: none">
-            for small proteins & sORFs
-          </router-link>
-        </h4>
-      </div>
-      <div class="col">
-        <h2 style="text-align: center; margin-top: 1em">
-          <router-link to="/browse" style="color: black; text-decoration: none">
-            Browse
-          </router-link>
-        </h2>
-        <h4 style="text-align: center">
-          <router-link to="/browse" style="color: gray; text-decoration: none">
-            the database
-          </router-link>
-        </h4>
-      </div>
-      <div class="col">
-        <h2 style="text-align: center; margin-top: 1em">
-          <router-link
-            to="/download"
-            style="color: black; text-decoration: none"
-          >
-            Download
-          </router-link>
-        </h2>
-        <h4 style="text-align: center">
-          <router-link
-            to="/download"
-            style="color: gray; text-decoration: none"
-          >
-            small protein groups, protein & nucleotide sequences, ...
-          </router-link>
-        </h4>
-      </div>
-    </div>
-    -->
 
     <h3 style="margin-top: 3em">About sORFdb</h3>
     <p style="text-align: justify">
-      sORFdb is a the first dedicated database for small open reading frames
-      (sORFs) and small proteins as well as their functions in bacteria of
-      different taxa. Small proteins with fewer than 100 and, in particular,
-      fewer than 50 amino acids are still largely unexplored. Nonetheless, they
-      represent an important part of the genetic repertoire of bacteria that
-      often remains neglected.
+      sORFdb is a dedicated database for short open reading frames (sORFs) and
+      small proteins as well as their functions in bacteria of different taxa.
+      Small proteins with fewer than 100 and, in particular, fewer than 50 amino
+      acids are still largely unexplored. Nonetheless, they represent an
+      important part of the genetic repertoire of bacteria that often remains
+      neglected.
       <br />
       To address this issue, sORFdb has been developed. It combines high quality
       information from genome and protein databases, enriching them with
-      additional information such as protein descriptors and the presence of
-      ribosomal binding sites. Additionally, hidden Markov models for novel
+      additional information such as physicochemical properties and the presence
+      of ribosomal binding sites. Additionally, hidden Markov models for novel
       identified small protein families are provided, which can be used for the
       computational prediction of small proteins. sORFdb aims to provide
       comprehensive high quality data for sORFs and small proteins and to
@@ -151,7 +105,7 @@
       To access the database an instant search and a BLAST search for sORFs and
       small protein sequences is available. The browse function provides a
       viewer for all database entries. The entries can be filtered using
-      criteria such as taxonomy, sequence length and protein descriptors.
+      criteria such as taxonomy, sequence length and physicochemical properties.
       <br />
       If you want to know more about the usage of the search and browse
       functions look here: <router-link to="/about">Documentation</router-link
