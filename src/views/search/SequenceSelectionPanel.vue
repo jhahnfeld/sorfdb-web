@@ -28,10 +28,12 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p style="margin-top: 1em">Examples: MRTGNAN or</p>
+        <p style="margin-top: 1em">
+          Examples: MSTFQALMLMLAIGSFIIALLTYIEKIDLP or
+        </p>
         <pre>
-          >SwissProt|Q47505|MCCC7_ECOLX
-          MRTGNAN
+          >SwissProt|A0A2K4Z9J5|BSRE_BACSU
+          MSTFQALMLMLAIGSFIIALLTYIEKIDLP
         </pre>
       </template>
       <template v-if="activeSequenceMode === 'Nucleotide sequence(s)'">
@@ -45,10 +47,12 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p style="margin-top: 1em">Example: ATGGAACTGACGGGGGACCCGGAGTGA or</p>
+        <p style="margin-top: 1em">
+          Example: ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG or
+        </p>
         <pre>
-          >MyDnaSequence
-          ATGGAACTGACGGGGGACCCGGAGTGA
+          >GenBank|ABFMQO020000063.1|MCU9633280.1
+          ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG
         </pre>
       </template>
       <template v-if="activeSequenceMode === 'Ids'">
@@ -64,7 +68,7 @@
         ></textarea>
         <p style="margin-top: 1em">Examples:</p>
         <pre>
-          SwissProt|Q47505|MCCC7_ECOLX
+          SwissProt|A0A2K4Z9J5|BSRE_BACSU
           GenBank|AABOTI020000010.1|MPA92906.1
         </pre>
       </template>
@@ -290,7 +294,7 @@ const isValid = computed(() => {
         (sequence.value.startsWith(">") || sequence.value.startsWith("@")) &&
         validateInputArray(sequences.value, validateProtein)) ||
       (activeSequenceMode.value === "Protein sequence(s)" &&
-        validateProtein(sequence.value))
+        validateProtein(sequence.value.trim()))
     ) {
       return { valid: true, error: "" };
     } else if (
@@ -298,7 +302,7 @@ const isValid = computed(() => {
         (sequence.value.startsWith(">") || sequence.value.startsWith("@")) &&
         validateInputArray(sequences.value, validateDNA)) ||
       (activeSequenceMode.value === "Nucleotide sequence(s)" &&
-        validateDNA(sequence.value))
+        validateDNA(sequence.value.trim()))
     ) {
       return { valid: true, error: "" };
     } else if (
