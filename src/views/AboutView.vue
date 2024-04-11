@@ -2,15 +2,35 @@
   <div class="container">
     <h1>About sORFdb</h1>
     <p>
-        sORFdb - A database for sORFs, small proteins, and small protein groups in bacteria
+      sORFdb is a database for sORFs, small proteins, and small protein groups
+      in bacteria.
+      <br />
+      It provides search and browsable sORF and small protein sequence data as
+      well as small protein families. The database is taxonomy independent and
+      the entries were quality-filtered for sORFs and small proteins with
+      evidence.
     </p>
     <p>
-      This website provides access to the sORFdb database. All information that is given below refers to this web service. Information regarding the commandline tool are provided via <a href="https://github.com/oschwengers/bakta" target="_blank">GitHub</a>.
+      For technical questions and bug reports, we happily accept issues on
+      <a href="https://github.com/jhahnfeld/sorfdb-web" target="_blank"
+        >GitHub</a
+      >. <br />
+      General contact and questions:
+      <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
+        >sorfdb@computational.bio.uni-giessen.de</a
+      >
     </p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, porro. Debitis numquam unde fugit ut, molestias cumque quibusdam error fugiat vitae. Enim quam pariatur deserunt molestias maxime autem voluptatum omnis?
-    Eius tenetur culpa tempore accusantium perspiciatis ullam voluptatibus vel facilis debitis alias quos dignissimos dolore, odio illum facere repellat nostrum id! Eius est maxime, eveniet aliquid alias accusantium ab dolorum?
-    Quisquam cupiditate, dolor quae fuga architecto similique expedita blanditiis tempore et. Dolorum minus ex recusandae dolor fugiat laborum praesentium eum, magnam earum ipsum harum beatae distinctio, voluptatem assumenda iusto sunt.
-    Distinctio ad iure eum officia sit sed, asperiores praesentium reprehenderit laudantium maiores tenetur recusandae, nemo sint! Voluptates ea enim accusamus vitae excepturi praesentium. Cupiditate facilis ducimus quo dolores laboriosam eum?
-    Non temporibus ex enim maxime molestias, quidem rem cupiditate nemo! A aspernatur ut, aut praesentium repellat cum id. Vero soluta velit sapiente aliquam quas repudiandae iure atque fugiat vel ad?
+    <p>
+      sORFdb is a specialized (unlike GenBank, Swiss-Prot and UniProt), taxonomy
+      independent (unlike SmProt) and quality-filtered (unlike GenBank and
+      UniProt) database for sORFs and small proteins. It combines and
+      complements the quality-filtered databases mentioned above into a
+      comprehensive database. Additionally, for small protein families are
+      provided with a product description and metrics based on the family
+      members. The website provides various functions for sequence and family
+      based small protein search and for sORF sequence search. The complete
+      database and small proteins can be interactively explored using the browse
+      function. All data are freely available for download.
+    </p>
   </div>
 </template>

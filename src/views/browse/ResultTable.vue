@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { type Option } from "@/components/CheckboxOption";
 import type { SortDirection, SortOption } from "@/model/Search";
-import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
+import { type PfamEntry, type SorfdbEntry } from "@/model/SorfdbSearchResult";
 import { type PropType } from "vue";
 import SortSymbol from "./SortSymbol.vue";
+import { round } from "@/util";
 const props = defineProps({
   entries: {
     type: Array as PropType<SorfdbEntry[]>,
@@ -23,11 +24,6 @@ const emit = defineEmits<{
   (e: "update:ordering", key: string, direction: SortDirection | null): void;
 }>();
 
-// function gc(entry: BakrepSearchResultEntry): string {
-//   if (!entry.bakta) return "?";
-//   return (entry.bakta.stats.gc * 100).toFixed(2) + " %";
-// }
-
 function passOrdering(sortkey: string, newdirection: SortDirection | null) {
   emit("update:ordering", sortkey, newdirection);
 }
@@ -41,8 +37,36 @@ function extractValue(entry: SorfdbEntry, c: Option) {
     }
   } else if (!val) {
     return "?";
+  } else if (c.key == "pfam-hits") {
+    if ((val as PfamEntry).length == 0) {
+      return "-";
+    } else {
+      return constructPfamEntries(val as PfamEntry);
+    }
   }
   return val;
+}
+
+function constructPfamEntries(entry: PfamEntry) {
+  const entryParts: String[] = [];
+  for (let e of entry) {
+    if (entryParts.length > 0) {
+      entryParts.push("\n");
+    }
+    let evalueAsString: string = e.evalue.toString();
+    if (evalueAsString.includes("e")) {
+      let evalueSplitted: string[] = evalueAsString.split("e");
+      let significand: string = round(
+        parseFloat(evalueSplitted[0]),
+        2,
+      ).toString();
+      let exponent: string = evalueSplitted[1];
+      entryParts.push(e.name + ": " + significand + "e" + exponent);
+    } else {
+      entryParts.push(e.name + ": " + e.evalue);
+    }
+  }
+  return entryParts.join("");
 }
 </script>
 

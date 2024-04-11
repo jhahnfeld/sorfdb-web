@@ -6,7 +6,15 @@ const props = defineProps({
   entry: { type: Object as PropType<SorfdbEntry>, required: true },
 });
 
-function hasRbs(rbs: number): string {
+function hasStartCodon(codon: string): string {
+  if (codon == "") {
+    return "?";
+  } else {
+    return codon;
+  }
+}
+
+function hasRbs(rbs: number | null): string {
   if (rbs == 0) {
     return "No" + rbs;
   } else if (rbs == 1) {
@@ -30,7 +38,7 @@ function hasRbs(rbs: number): string {
       </tr>
       <tr>
         <th class="text-end">Start-codon:</th>
-        <td class="ps-5">{{ entry["start-codon"] }}</td>
+        <td class="ps-5">{{ hasStartCodon(entry["start-codon"]) }}</td>
       </tr>
       <tr>
         <th class="text-end">Product:</th>
@@ -38,7 +46,7 @@ function hasRbs(rbs: number): string {
       </tr>
       <tr>
         <th class="text-end">Ribosomal binding site:</th>
-        <td class="ps-5">{{ entry.rbs == 1 ? "Yes" : "No" }}</td>
+        <td class="ps-5">{{ hasRbs(entry.rbs) }}</td>
       </tr>
     </tbody>
   </table>

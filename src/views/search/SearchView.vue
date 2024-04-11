@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type PaginationData } from "@/components/pagination/Pagination";
 import type {
-  CompoundQuery,
+  InQuery,
   SearchInfo,
   SortDirection,
   SortOption,
@@ -9,18 +9,21 @@ import type {
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
 import usePageState, { State } from "@/PageState";
 import { useApi } from "@/SorfdbApi";
-import { onMounted, shallowRef, unref } from "vue";
-
+import { onMounted, shallowRef } from "vue";
 import type { Option } from "@/components/CheckboxOption";
-import { ref, type Ref } from "vue";
+import router from "@/router";
+import { useRoute } from "vue-router";
+import { computed, ref, type Ref } from "vue";
 import { resultTableColums } from "../browse/ResultColumns";
 import ResultsPanel from "../browse/ResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
 import SequenceSelectionPanel from "./SequenceSelectionPanel.vue";
+
+const route = useRoute();
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
-const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
+const query: Ref<InQuery | undefined> = ref();
 
 const api = shallowRef(useApi());
 const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });
@@ -29,6 +32,21 @@ const exportInProgress = ref(false);
 
 const allColumns = ref<Option[]>(resultTableColums());
 const resultsPanel = ref<typeof ResultsPanel>();
+
+export type Tab = { id: string; name: string };
+
+const tabs: Tab[] = [
+  { id: "sequence", name: "Sequences" },
+  { id: "family", name: "Families" },
+];
+
+const active_tab: Ref<string> = computed(() =>
+  route.params.tab ? (route.params.tab as string) : "sequence",
+);
+
+function updateTab(newTab: string) {
+  router.push({ name: "search-tab", params: { tab: newTab } });
+}
 
 function updateOrdering(sortkey: string, direction: SortDirection | null) {
   const idx = ordering.value.findIndex((s) => s.field === sortkey);
@@ -41,12 +59,14 @@ function updateOrdering(sortkey: string, direction: SortDirection | null) {
   }
   search();
 }
+
 function search(offset = 0) {
   searchState.value.setState(State.Loading);
   if (resultsPanel.value) resultsPanel.value.resetTsvExport();
+  if (query.value == undefined) return;
   api.value
     .search({
-      query: unref(query),
+      query: query.value,
       sort: ordering.value,
       offset: offset,
       limit: pagination.value.limit,
@@ -62,29 +82,27 @@ function search(offset = 0) {
 
 function _search(req: SequenceSearchRequest) {
   if (req.type === "protein" && req.mode === "exact") {
-    const clauses = req.sequences.map((s) => ({
+    query.value = {
       field: "protein",
-      op: "==",
-      value: s,
-    }));
-    query.value = { op: "or", value: clauses };
+      op: "in",
+      value: req.sequences,
+    };
   } else if (req.type === "dna" && req.mode === "exact") {
-    const clauses = req.sequences.map((s) => ({
+    query.value = {
       field: "sorf",
-      op: "==",
-      value: s,
-    }));
-    query.value = { op: "or", value: clauses };
+      op: "in",
+      value: req.sequences,
+    };
   } else if (req.type === "id") {
-    const clauses = req.ids.map((s) => ({
+    query.value = {
       field: "id",
-      op: "==",
-      value: s,
-    }));
-    query.value = { op: "or", value: clauses };
+      op: "in",
+      value: req.ids,
+    };
   }
   search();
 }
+
 const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
 
 function updateAllColumns(info: SearchInfo) {
@@ -103,6 +121,7 @@ function updateAllColumns(info: SearchInfo) {
     }
   }
 }
+
 function init() {
   pageState.value.setState(State.Loading);
   api.value
@@ -114,29 +133,65 @@ function init() {
     })
     .catch((err) => pageState.value.setError(err));
 }
+
 onMounted(init);
 </script>
 
 <template>
   <main class="container pt-5">
-    <SequenceSelectionPanel
-      @search="_search"
-      :submitting="searchState.loading"
-    />
-    <ResultsPanel
-      ref="resultsPanel"
-      :api="api"
-      :all-columns="allColumns"
-      :entries="entries"
-      :pagination="pagination"
-      :ordering="ordering"
-      :query="query"
-      :search-state="searchState"
-      :export-in-progress="exportInProgress"
-      @search="search"
-      @update:ordering="updateOrdering"
-      @update:exportInProgress="(e) => (exportInProgress = e)"
-    />
+    <div class="mx-3">
+      <ul class="nav nav-pills py-3">
+        <li class="nav-item" v-for="item in tabs" :key="item.id">
+          <button
+            class="nav-link"
+            :class="{ active: active_tab === item.id }"
+            @click="updateTab(item.id)"
+          >
+            <h3>{{ item.name }}</h3>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <template v-if="active_tab === 'sequence'">
+      <SequenceSelectionPanel
+        @search="_search"
+        :submitting="searchState.loading"
+      />
+      <ResultsPanel
+        ref="resultsPanel"
+        v-if="query"
+        :api="api"
+        :all-columns="allColumns"
+        :entries="entries"
+        :pagination="pagination"
+        :ordering="ordering"
+        :query="query"
+        :search-state="searchState"
+        :export-in-progress="exportInProgress"
+        @search="search"
+        @update:ordering="updateOrdering"
+        @update:exportInProgress="(e) => (exportInProgress = e)"
+      />
+    </template>
+    <template v-if="active_tab === 'family'">
+      <h2>WIP</h2>
+      <ResultsPanel
+        ref="resultsPanel"
+        v-if="query"
+        :api="api"
+        :all-columns="allColumns"
+        :entries="entries"
+        :pagination="pagination"
+        :ordering="ordering"
+        :query="query"
+        :search-state="searchState"
+        :export-in-progress="exportInProgress"
+        @search="search"
+        @update:ordering="updateOrdering"
+        @update:exportInProgress="(e) => (exportInProgress = e)"
+      />
+    </template>
   </main>
 </template>
 

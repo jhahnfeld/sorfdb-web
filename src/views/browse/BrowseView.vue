@@ -18,14 +18,26 @@ import type {
   SortOption,
 } from "@/model/Search";
 import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
-import { computed, onMounted, ref, unref, type Ref, shallowRef } from "vue";
+import {
+  computed,
+  onMounted,
+  ref,
+  unref,
+  type Ref,
+  shallowRef,
+  watch,
+} from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { resultTableColums } from "./ResultColumns";
 import ResultsPanel from "./ResultsPanel.vue";
+
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
 
 const api = shallowRef(useApi());
+const route = useRoute();
+const router = useRouter();
 const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });
 const query: Ref<CompoundQuery> = ref({ op: "and", value: [] });
 const ordering: Ref<SortOption[]> = ref([{ field: "id", ord: "asc" }]);
@@ -33,6 +45,58 @@ const searchinfo: Ref<SearchInfo> = ref({ fields: [] });
 const exportInProgress = ref(false);
 
 const allColumns = ref<Option[]>(resultTableColums());
+
+function encodeQuery(): string {
+  return btoa(JSON.stringify({ query: query.value, ordering: ordering.value }));
+}
+function decodeQuery(encodedQuery: string): {
+  query: CompoundQuery;
+  ordering: SortOption[];
+} {
+  return JSON.parse(atob(encodedQuery));
+}
+function populateVariables() {
+  if (route.query.query) {
+    const decodedQuery = decodeQuery(route.query.query as string);
+    query.value = decodedQuery.query;
+    ordering.value = decodedQuery.ordering;
+    pagination.value.offset = Number.parseInt(route.query.offset as string);
+    pagination.value.limit = Number.parseInt(route.query.limit as string);
+    search(pagination.value.offset);
+  }
+}
+watch(
+  () => route.query,
+  () => {
+    populateVariables();
+  },
+);
+
+function updateQuery(offset = 0) {
+  router.push({
+    name: "browse",
+    query: {
+      offset: offset,
+      limit: pagination.value.limit,
+      query: encodeQuery(),
+    },
+  });
+}
+
+export type Tab = { id: string; name: string };
+
+const tabs: Tab[] = [
+  { id: "sequence", name: "Sequences" },
+  { id: "family", name: "Families" },
+];
+
+const active_tab: Ref<string> = computed(() =>
+  route.params.tab ? (route.params.tab as string) : "sequence",
+);
+
+function updateTab(newTab: string) {
+  router.push({ name: "browse-tab", params: { tab: newTab } });
+}
 
 function updateAllColumns(info: SearchInfo) {
   const index = allColumns.value.reduce(
@@ -80,6 +144,7 @@ function init() {
       updateAllColumns(r);
       pageState.value.setState(State.Main);
     })
+    .then(populateVariables)
     .catch((err) => pageState.value.setError(err));
 }
 
@@ -130,6 +195,7 @@ function search(offset = 0) {
       searchState.value.setState(State.Main);
       if (r.offset) pagination.value.offset = r.offset;
       pagination.value.total = r.total;
+      updateQuery(r.offset);
     })
     .catch((err) => pageState.value.setError(err));
 }
@@ -153,28 +219,65 @@ onMounted(init);
 
 <template>
   <main class="container pt-5">
-    <Loading :state="pageState">
-      <div class="row">
-        <h2>Browse</h2>
-        <div class="col-12">
-          <QueryBuilder v-model:query="query" :rules="rules" @submit="search" />
-        </div>
-      </div>
-      <div class="col-12">
-        <div class="d-flex mt-2 mb-5 justify-content-end">
+    <div>
+      <ul class="nav nav-pills py-3">
+        <li class="nav-item" v-for="item in tabs" :key="item.id">
           <button
-            @click="search(0)"
-            class="btn btn-primary"
-            type="button"
-            id="button-search"
-            :disabled="exportInProgress"
+            class="nav-link"
+            :class="{ active: active_tab === item.id }"
+            @click="updateTab(item.id)"
           >
-            Search
+            <h3>{{ item.name }}</h3>
           </button>
+        </li>
+      </ul>
+    </div>
+
+    <template v-if="active_tab === 'sequence'">
+      <Loading :state="pageState">
+        <div class="row">
+          <div class="col-12">
+            <QueryBuilder
+              v-model:query="query"
+              :rules="rules"
+              @submit="search"
+            />
+          </div>
         </div>
-      </div>
+        <div class="col-12">
+          <div class="d-flex mt-2 mb-5 justify-content-end">
+            <button
+              @click="search(0)"
+              class="btn btn-primary"
+              type="button"
+              id="button-search"
+              :disabled="exportInProgress"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+        <ResultsPanel
+          ref="resultsPanel"
+          :api="api"
+          :all-columns="allColumns"
+          :entries="entries"
+          :pagination="pagination"
+          :ordering="ordering"
+          :query="query"
+          :search-state="searchState"
+          :export-in-progress="exportInProgress"
+          @search="updateQuery"
+          @update:ordering="updateOrdering"
+          @update:exportInProgress="(e) => (exportInProgress = e)"
+        />
+      </Loading>
+    </template>
+    <template v-if="active_tab === 'family'">
+      <h2>WIP</h2>
       <ResultsPanel
         ref="resultsPanel"
+        v-if="query"
         :api="api"
         :all-columns="allColumns"
         :entries="entries"
@@ -187,7 +290,7 @@ onMounted(init);
         @update:ordering="updateOrdering"
         @update:exportInProgress="(e) => (exportInProgress = e)"
       />
-    </Loading>
+    </template>
   </main>
 </template>
 

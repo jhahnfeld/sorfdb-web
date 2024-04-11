@@ -19,6 +19,11 @@ export type StringQuery = {
   op: "==" | "~";
   value: string;
 };
+export type InQuery = {
+  field: string;
+  op: "in";
+  value: string[];
+};
 export type CompoundQuery = {
   op: "or" | "and";
   value: Query[];
@@ -40,7 +45,8 @@ export type Query =
   | NumberQuery
   | StringQuery
   | NestedQuery
-  | RangeQuery;
+  | RangeQuery
+  | InQuery;
 
 export type LeafQuery = NumberQuery | RangeQuery | StringQuery;
 
@@ -99,7 +105,10 @@ export type SearchInfoLeaf = {
   ops: string[];
   type: "text" | "number";
   sortable: boolean;
+  min: number;
+  max: number;
 };
+
 export type SearchInfoNested = {
   field: string;
   fields: SearchInfoField[];

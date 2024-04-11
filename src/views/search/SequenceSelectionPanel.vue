@@ -1,8 +1,5 @@
 <template>
   <div class="container page-body flex-grow-1 mb-2">
-    <div class="row">
-      <h2>Sequence search</h2>
-    </div>
     <ul class="nav nav-underline">
       <li class="nav-item">
         <span class="nav-link disabled">Search by</span>
@@ -19,7 +16,7 @@
       </li>
     </ul>
 
-    <form ref="submitform" @submit.prevent="submit()">
+    <form ref="submitform" @submit.prevent="dummySubmit()">
       <template v-if="activeSequenceMode === 'Protein sequence(s)'">
         <textarea
           class="form-control form-control-lg"
@@ -31,10 +28,12 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p>Examples: MRTGNAN or</p>
+        <p style="margin-top: 1em">
+          Examples: MSTFQALMLMLAIGSFIIALLTYIEKIDLP or
+        </p>
         <pre>
-          >SwissProt|Q47505|MCCC7_ECOLX
-          MRTGNAN
+          >SwissProt|A0A2K4Z9J5|BSRE_BACSU
+          MSTFQALMLMLAIGSFIIALLTYIEKIDLP
         </pre>
       </template>
       <template v-if="activeSequenceMode === 'Nucleotide sequence(s)'">
@@ -48,10 +47,12 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p>Example: ATGGAACTGACGGGGGACCCGGAGTGA or</p>
+        <p style="margin-top: 1em">
+          Example: ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG or
+        </p>
         <pre>
-          >MyDnaSequence
-          ATGGAACTGACGGGGGACCCGGAGTGA
+          >GenBank|ABFMQO020000063.1|MCU9633280.1
+          ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG
         </pre>
       </template>
       <template v-if="activeSequenceMode === 'Ids'">
@@ -65,9 +66,9 @@
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
-        <p>Examples:</p>
+        <p style="margin-top: 1em">Examples:</p>
         <pre>
-          SwissProt|Q47505|MCCC7_ECOLX
+          SwissProt|A0A2K4Z9J5|BSRE_BACSU
           GenBank|AABOTI020000010.1|MPA92906.1
         </pre>
       </template>
@@ -104,7 +105,7 @@
           </label>
         </div>        
       -->
-      <ul class="nav nav-underline">
+      <ul class="nav nav-underline" style="margin-top: 1em">
         <li class="nav-item">
           <span class="nav-link disabled">Search mode</span>
         </li>
@@ -156,7 +157,7 @@
           type="button"
           id="submit-button"
           :disabled="!isValid.valid"
-          @click="submit"
+          @click.self="submit"
         >
           Search
         </button>
@@ -173,6 +174,7 @@
   </div>
   <notificationMessage :message="isValid.error" />
 </template>
+
 <script setup lang="ts">
 import {
   validateDNA,
@@ -181,7 +183,12 @@ import {
   validateInputArray,
 } from "@/search-validator";
 import { computed, ref, type PropType } from "vue";
-import { extractSequencesFromFasta, uniqueArray } from "@/fasta-handler";
+import {
+  extractSequencesFromFasta,
+  fastaFromSequences,
+  uniqueArray,
+} from "@/fasta-handler";
+import { blastRequest, parseBlastResults } from "@/blastApi";
 import type { SequenceSearchRequest } from "./SequenceSearchRequest";
 import notificationMessage from "@/components/Notification.vue";
 import ProgressBar from "@/components/ProgressBar.vue";
@@ -227,7 +234,7 @@ function allowedFileTypes(mode: string): string {
   }
 }
 
-const sequences = computed(() => {
+const sequences = computed<string[]>(() => {
   if (sequence.value.startsWith(">") || sequence.value.startsWith("@")) {
     return extractSequencesFromFasta(
       sequence.value,
@@ -242,7 +249,10 @@ const sequences = computed(() => {
       );
     }
   } else if (sequenceFileContent.value.length > 0) {
-    if (sequenceFileContent.value.startsWith(">")) {
+    if (
+      sequenceFileContent.value.startsWith(">") ||
+      sequence.value.startsWith("@")
+    ) {
       return extractSequencesFromFasta(
         sequenceFileContent.value,
         maxSequenceLengths[activeSequenceMode.value],
@@ -258,19 +268,33 @@ const sequences = computed(() => {
 });
 
 const isValid = computed(() => {
+  if (new Blob(sequences.value).size / (1024 * 1024) >= 46) {
+    return {
+      valid: false,
+      error:
+        "The sequence search is limited to 50MB. Please perform a local search. Small proteins, sORFs and HMMs for small protein families are available in the Download tab. Recommended BLAST parameters are available in the FAQ.",
+    };
+  }
+  if (sequences.value.length > 50000000) {
+    return {
+      valid: false,
+      error:
+        "The sequence search is limited to 50,000,000 sequences. Please perform a local search. Small proteins, sORFs and HMMs for small protein families are available in the Download tab. Recommended BLAST parameters are available in the FAQ.",
+    };
+  }
   if (sequence.value.length > 0 && sequenceFile.value != null) {
     return {
       valid: false,
       error: "Please use the input field or an uploaded file not both!",
     };
   }
-  if (activeAlignMode.value === "Exact" && sequence.value.length > 0) {
+  if (sequence.value.length > 0) {
     if (
       (activeSequenceMode.value === "Protein sequence(s)" &&
         (sequence.value.startsWith(">") || sequence.value.startsWith("@")) &&
         validateInputArray(sequences.value, validateProtein)) ||
       (activeSequenceMode.value === "Protein sequence(s)" &&
-        validateProtein(sequence.value))
+        validateProtein(sequence.value.trim()))
     ) {
       return { valid: true, error: "" };
     } else if (
@@ -278,7 +302,7 @@ const isValid = computed(() => {
         (sequence.value.startsWith(">") || sequence.value.startsWith("@")) &&
         validateInputArray(sequences.value, validateDNA)) ||
       (activeSequenceMode.value === "Nucleotide sequence(s)" &&
-        validateDNA(sequence.value))
+        validateDNA(sequence.value.trim()))
     ) {
       return { valid: true, error: "" };
     } else if (
@@ -292,11 +316,7 @@ const isValid = computed(() => {
         error: `Could not match input with type: ${activeSequenceMode.value}`,
       };
     }
-  } else if (
-    activeAlignMode.value === "Exact" &&
-    sequence.value.length == 0 &&
-    sequences.value.length > 0
-  ) {
+  } else if (sequence.value.length == 0 && sequences.value.length > 0) {
     if (
       activeSequenceMode.value === "Protein sequence(s)" &&
       validateInputArray(sequences.value, validateProtein)
@@ -359,26 +379,61 @@ function updateSequenceFile(evt: Event): void {
   loadingProgress.value.title = "Loading FASTA file...";
 }
 
-const submit = () => {
-  console.log(sequences.value);
+const dummySubmit = () => {};
+
+const submit = async () => {
   if (activeSequenceMode.value === "Protein sequence(s)") {
-    if (activeAlignMode.value === "Exact")
+    if (activeAlignMode.value === "Exact") {
       emit("search", {
         mode: "exact",
         sequences: sequences.value,
         type: "protein",
       });
+    } else if (activeAlignMode.value === "Blast") {
+      const blastResults = await blastRequest(
+        "blastp",
+        fastaFromSequences(sequences.value),
+      );
+      if (blastResults != null) {
+        const blastHitIds = parseBlastResults(
+          blastResults,
+          identity.value,
+          coverage.value,
+        );
+        emit("search", {
+          ids: [...blastHitIds],
+          type: "id",
+        });
+      }
+    }
   } else if (activeSequenceMode.value === "Nucleotide sequence(s)") {
-    if (activeAlignMode.value === "Exact")
+    if (activeAlignMode.value === "Exact") {
       emit("search", {
         mode: "exact",
         sequences: sequences.value,
         type: "dna",
       });
+    } else if (activeAlignMode.value === "Blast") {
+      const blastResults = await blastRequest(
+        "blastx",
+        fastaFromSequences(sequences.value),
+      );
+      if (blastResults != null) {
+        const blastHitIds = parseBlastResults(
+          blastResults,
+          identity.value,
+          coverage.value,
+        );
+        emit("search", {
+          ids: [...blastHitIds],
+          type: "id",
+        });
+      }
+    }
   } else if (activeSequenceMode.value === "Ids") {
     emit("search", {
       ids: sequences.value,
-      type: "id", // TODO set to Ids
+      type: "id",
     });
   }
 };
