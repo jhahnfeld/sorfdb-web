@@ -30,6 +30,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import { resultTableColums } from "./ResultColumns";
 import ResultsPanel from "./ResultsPanel.vue";
+import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
 
 const pageState = usePageState();
 const searchState = usePageState();
@@ -81,21 +82,6 @@ function updateQuery(offset = 0) {
       query: encodeQuery(),
     },
   });
-}
-
-export type Tab = { id: string; name: string };
-
-const tabs: Tab[] = [
-  { id: "sequence", name: "Sequences" },
-  { id: "family", name: "Families" },
-];
-
-const active_tab: Ref<string> = computed(() =>
-  route.params.tab ? (route.params.tab as string) : "sequence",
-);
-
-function updateTab(newTab: string) {
-  router.push({ name: "browse-tab", params: { tab: newTab } });
 }
 
 function updateAllColumns(info: SearchInfo) {
@@ -219,61 +205,9 @@ onMounted(init);
 
 <template>
   <main class="container pt-5">
-    <div>
-      <ul class="nav nav-pills py-3">
-        <li class="nav-item" v-for="item in tabs" :key="item.id">
-          <button
-            class="nav-link"
-            :class="{ active: active_tab === item.id }"
-            @click="updateTab(item.id)"
-          >
-            <h3>{{ item.name }}</h3>
-          </button>
-        </li>
-      </ul>
-    </div>
+    <SequenceFamilySelector namePrefix="browse" />
 
-    <template v-if="active_tab === 'sequence'">
-      <Loading :state="pageState">
-        <div class="row">
-          <div class="col-12">
-            <QueryBuilder
-              v-model:query="query"
-              :rules="rules"
-              @submit="search"
-            />
-          </div>
-        </div>
-        <div class="col-12">
-          <div class="d-flex mt-2 mb-5 justify-content-end">
-            <button
-              @click="search(0)"
-              class="btn btn-primary"
-              type="button"
-              id="button-search"
-              :disabled="exportInProgress"
-            >
-              Search
-            </button>
-          </div>
-        </div>
-        <ResultsPanel
-          ref="resultsPanel"
-          :api="api"
-          :all-columns="allColumns"
-          :entries="entries"
-          :pagination="pagination"
-          :ordering="ordering"
-          :query="query"
-          :search-state="searchState"
-          :export-in-progress="exportInProgress"
-          @search="updateQuery"
-          @update:ordering="updateOrdering"
-          @update:exportInProgress="(e) => (exportInProgress = e)"
-        />
-      </Loading>
-    </template>
-    <template v-if="active_tab === 'family'">
+    <Loading :state="pageState">
       <h2>WIP</h2>
       <ResultsPanel
         ref="resultsPanel"
@@ -290,7 +224,7 @@ onMounted(init);
         @update:ordering="updateOrdering"
         @update:exportInProgress="(e) => (exportInProgress = e)"
       />
-    </template>
+    </Loading>
   </main>
 </template>
 

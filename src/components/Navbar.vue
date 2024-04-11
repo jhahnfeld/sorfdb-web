@@ -2,8 +2,8 @@
 import { ref } from "vue";
 const items = ref([
   { href: { name: "home" }, text: "Home" },
-  { href: { name: "search" }, text: "Search" },
-  { href: { name: "browse" }, text: "Browse" },
+  { href: { name: "search-sequence" }, text: "Search" },
+  { href: { name: "browse-sequence" }, text: "Browse" },
   { href: { name: "download" }, text: "Download" },
   { href: { name: "documentation" }, text: "Documentation" },
   { href: { name: "faq" }, text: "FAQ" },

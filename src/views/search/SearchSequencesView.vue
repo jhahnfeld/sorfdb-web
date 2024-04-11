@@ -18,6 +18,7 @@ import { resultTableColums } from "../browse/ResultColumns";
 import ResultsPanel from "../browse/ResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
 import SequenceSelectionPanel from "./SequenceSelectionPanel.vue";
+import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
 
 const route = useRoute();
 const pageState = usePageState();
@@ -32,21 +33,6 @@ const exportInProgress = ref(false);
 
 const allColumns = ref<Option[]>(resultTableColums());
 const resultsPanel = ref<typeof ResultsPanel>();
-
-export type Tab = { id: string; name: string };
-
-const tabs: Tab[] = [
-  { id: "sequence", name: "Sequences" },
-  { id: "family", name: "Families" },
-];
-
-const active_tab: Ref<string> = computed(() =>
-  route.params.tab ? (route.params.tab as string) : "sequence",
-);
-
-function updateTab(newTab: string) {
-  router.push({ name: "search-tab", params: { tab: newTab } });
-}
 
 function updateOrdering(sortkey: string, direction: SortDirection | null) {
   const idx = ordering.value.findIndex((s) => s.field === sortkey);
@@ -139,59 +125,27 @@ onMounted(init);
 
 <template>
   <main class="container pt-5">
-    <div class="mx-3">
-      <ul class="nav nav-pills py-3">
-        <li class="nav-item" v-for="item in tabs" :key="item.id">
-          <button
-            class="nav-link"
-            :class="{ active: active_tab === item.id }"
-            @click="updateTab(item.id)"
-          >
-            <h3>{{ item.name }}</h3>
-          </button>
-        </li>
-      </ul>
-    </div>
+    <SequenceFamilySelector namePrefix="search" />
 
-    <template v-if="active_tab === 'sequence'">
-      <SequenceSelectionPanel
-        @search="_search"
-        :submitting="searchState.loading"
-      />
-      <ResultsPanel
-        ref="resultsPanel"
-        v-if="query"
-        :api="api"
-        :all-columns="allColumns"
-        :entries="entries"
-        :pagination="pagination"
-        :ordering="ordering"
-        :query="query"
-        :search-state="searchState"
-        :export-in-progress="exportInProgress"
-        @search="search"
-        @update:ordering="updateOrdering"
-        @update:exportInProgress="(e) => (exportInProgress = e)"
-      />
-    </template>
-    <template v-if="active_tab === 'family'">
-      <h2>WIP</h2>
-      <ResultsPanel
-        ref="resultsPanel"
-        v-if="query"
-        :api="api"
-        :all-columns="allColumns"
-        :entries="entries"
-        :pagination="pagination"
-        :ordering="ordering"
-        :query="query"
-        :search-state="searchState"
-        :export-in-progress="exportInProgress"
-        @search="search"
-        @update:ordering="updateOrdering"
-        @update:exportInProgress="(e) => (exportInProgress = e)"
-      />
-    </template>
+    <SequenceSelectionPanel
+      @search="_search"
+      :submitting="searchState.loading"
+    />
+    <ResultsPanel
+      ref="resultsPanel"
+      v-if="query"
+      :api="api"
+      :all-columns="allColumns"
+      :entries="entries"
+      :pagination="pagination"
+      :ordering="ordering"
+      :query="query"
+      :search-state="searchState"
+      :export-in-progress="exportInProgress"
+      @search="search"
+      @update:ordering="updateOrdering"
+      @update:exportInProgress="(e) => (exportInProgress = e)"
+    />
   </main>
 </template>
 
