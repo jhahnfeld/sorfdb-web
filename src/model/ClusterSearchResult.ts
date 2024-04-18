@@ -1,14 +1,13 @@
 import { z } from "zod";
 
 const TreeNodeScheme = z.object({
-  id: z.string(),
+  id: z.number(),
   rank: z.string(),
   label: z.string(),
   value: z.number(),
-  parent: z.optional(z.string()),
+  parent: z.nullable(z.number()),
 });
 
-const FastaContentScheme = z.string();
 const FlatTreeScheme = z.array(TreeNodeScheme);
 
 const ClusterEntryScheme = z.object({
@@ -16,33 +15,43 @@ const ClusterEntryScheme = z.object({
   statistics: z.object({
     sequenceCount: z.number(),
     averageSequenceLength: z.number(),
-    MedianSequenceLength: z.number(),
+    medianSequenceLength: z.number(),
     taxonomy: FlatTreeScheme,
   }),
   function: z.string(),
-  alignment: FastaContentScheme,
+  alignment: z.string(),
 });
 
-const SorfdbClusterSearchResultSchema = z.object({
+const ClusterSearchScheme = z.object({
+  id: z.string(),
+  statistics: z.object({
+    sequenceCount: z.number(),
+    averageSequenceLength: z.number(),
+    medianSequenceLength: z.number(),
+    taxonomy: FlatTreeScheme,
+  }),
+  function: z.string(),
+});
+
+const SorfdbClusterSearchResultScheme = z.object({
   offset: z.optional(z.number()),
   search_after: z.array(
     z.union([z.string(), z.number(), z.boolean(), z.null()]),
   ),
   total: z.number(),
-  results: z.array(ClusterEntryScheme),
+  results: z.array(ClusterSearchScheme),
 });
 
-export type FastaContent = z.infer<typeof FastaContentScheme>;
 export type TreeNodeEntry = z.infer<typeof TreeNodeScheme>;
 export type FlatTree = z.infer<typeof FlatTreeScheme>;
 export type ClusterEntry = z.infer<typeof ClusterEntryScheme>;
 export type SorfdbClusterSearchResult = z.infer<
-  typeof SorfdbClusterSearchResultSchema
+  typeof SorfdbClusterSearchResultScheme
 >;
 
 export {
   TreeNodeScheme,
   FlatTreeScheme,
   ClusterEntryScheme,
-  FastaContentScheme,
+  SorfdbClusterSearchResultScheme,
 };
