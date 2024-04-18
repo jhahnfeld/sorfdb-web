@@ -1,4 +1,4 @@
-import { type SorfdbApi } from "@/SorfdbApi";
+import { type SorfdbApi, type SorfdbClusterApi } from "@/SorfdbApi";
 import type { Query, SearchAfter, SortOption } from "@/model/Search";
 
 /**
@@ -13,7 +13,7 @@ import type { Query, SearchAfter, SortOption } from "@/model/Search";
  * @param handler
  */
 export function downloadFullTsv(
-  api: SorfdbApi,
+  api: SorfdbApi | SorfdbClusterApi,
   req: ExportRequest,
   handler: ExportHandler,
 ): AbortController {
