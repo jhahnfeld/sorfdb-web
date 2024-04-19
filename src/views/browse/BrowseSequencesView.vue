@@ -75,7 +75,7 @@ watch(
 
 function updateQuery(offset = 0) {
   router.push({
-    name: "browse",
+    name: "browse-sequence",
     query: {
       offset: offset,
       limit: pagination.value.limit,
