@@ -45,6 +45,7 @@ const SorfdbClusterSearchResultScheme = z.object({
 export type TreeNodeEntry = z.infer<typeof TreeNodeScheme>;
 export type FlatTree = z.infer<typeof FlatTreeScheme>;
 export type ClusterEntry = z.infer<typeof ClusterEntryScheme>;
+export type ClusterSearchEntry = z.infer<typeof ClusterSearchScheme>;
 export type SorfdbClusterSearchResult = z.infer<
   typeof SorfdbClusterSearchResultScheme
 >;

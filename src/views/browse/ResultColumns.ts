@@ -18,6 +18,16 @@ export function defaultColumns() {
   ];
 }
 
+export function defaultClusterColumns() {
+  return [
+    "id",
+    "statistics.sequenceCount",
+    "statistics.averageSequenceLength",
+    "statistics.medianSequenceLength",
+    "function",
+  ];
+}
+
 export function resultTableColums() {
   return [
     { group: "General", label: "sORF ID", key: "id", link: true },
@@ -81,5 +91,32 @@ export function resultTableColums() {
       key: "aliphatic-index",
     },
     { group: "Protein&nbsp;descriptors", label: "Boman", key: "boman" },
+  ];
+}
+
+export function clusterResultTableColums() {
+  return [
+    { group: "General", label: "Family ID", key: "id", link: false },
+    { group: "General", label: "Function", key: "function" },
+    {
+      group: "Statisitcs",
+      label: "Sequence count",
+      key: "statistics.sequenceCount",
+    },
+    {
+      group: "Statisitcs",
+      label: "Mean length",
+      key: "statistics.averageSequenceLength",
+    },
+    {
+      group: "Statisitcs",
+      label: "Median Length",
+      key: "statistics.medianSequenceLength",
+    },
+    {
+      group: "Taxonomy",
+      label: "Taxonomy",
+      key: "statistics.taxonomy.label",
+    },
   ];
 }

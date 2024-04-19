@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import usePageState, { State } from "@/PageState";
-import { useApi } from "@/SorfdbApi";
+import { useClusterApi as useApi } from "@/SorfdbApi";
 import { type Option } from "@/components/CheckboxOption";
 import Loading from "@/components/Loading.vue";
 import { type PaginationData } from "@/components/pagination/Pagination";
@@ -17,7 +17,7 @@ import type {
   SortDirection,
   SortOption,
 } from "@/model/Search";
-import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
+import type { ClusterSearchEntry } from "@/model/ClusterSearchResult.ts";
 import {
   computed,
   onMounted,
@@ -28,13 +28,13 @@ import {
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { resultTableColums } from "./ResultColumns";
-import ResultsPanel from "./ResultsPanel.vue";
+import { clusterResultTableColums as resultTableColums } from "./ResultColumns";
+import ResultsPanel from "./ClusterResultsPanel.vue";
 import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
 
 const pageState = usePageState();
 const searchState = usePageState();
-const entries: Ref<SorfdbEntry[]> = ref([]);
+const entries: Ref<ClusterSearchEntry[]> = ref([]);
 
 const api = shallowRef(useApi());
 const route = useRoute();
@@ -75,7 +75,7 @@ watch(
 
 function updateQuery(offset = 0) {
   router.push({
-    name: "browse",
+    name: "browse-family",
     query: {
       offset: offset,
       limit: pagination.value.limit,
@@ -208,7 +208,24 @@ onMounted(init);
     <SequenceFamilySelector namePrefix="browse" />
 
     <Loading :state="pageState">
-      <h2>WIP</h2>
+      <div class="row">
+        <div class="col-12">
+          <QueryBuilder v-model:query="query" :rules="rules" @submit="search" />
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="d-flex mt-2 mb-5 justify-content-end">
+          <button
+            @click="search(0)"
+            class="btn btn-primary"
+            type="button"
+            id="button-search"
+            :disabled="exportInProgress"
+          >
+            Search
+          </button>
+        </div>
+      </div>
       <ResultsPanel
         ref="resultsPanel"
         v-if="query"
