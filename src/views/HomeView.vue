@@ -34,7 +34,7 @@
         <div class="col-xs-12 col-md-4">
           <h2 style="text-align: center; margin-top: 1em">
             <router-link
-              to="/search"
+              to="/search/sequence"
               style="color: black; text-decoration: none"
             >
               Icon1
@@ -44,7 +44,7 @@
         <div class="col-xs-12 col-md-4">
           <h2 style="text-align: center; margin-top: 1em">
             <router-link
-              to="/browse"
+              to="/browse/sequence"
               style="color: black; text-decoration: none"
             >
               Icon2
