@@ -6,22 +6,21 @@ import type {
   SortDirection,
   SortOption,
 } from "@/model/Search";
-import type { SorfdbEntry } from "@/model/SorfdbSearchResult";
+import type { ClusterSearchEntry } from "@/model/ClusterSearchResult.ts";
 import usePageState, { State } from "@/PageState";
-import { useApi } from "@/SorfdbApi";
+import { useClusterApi as useApi } from "@/SorfdbApi";
 import { onMounted, shallowRef } from "vue";
 import type { Option } from "@/components/CheckboxOption";
-import { useRoute } from "vue-router";
 import { ref, type Ref } from "vue";
-import { resultTableColums } from "../browse/ResultColumns";
-import ResultsPanel from "../browse/ResultsPanel.vue";
+import { clusterResultTableColums as resultTableColums } from "../browse/ResultColumns";
+import ResultsPanel from "@/views/browse/ClusterResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
+import FamilySelectionPanel from "./FamilySelectionPanel.vue";
 import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
 
-const route = useRoute();
 const pageState = usePageState();
 const searchState = usePageState();
-const entries: Ref<SorfdbEntry[]> = ref([]);
+const entries: Ref<ClusterSearchEntry[]> = ref([]);
 const query: Ref<InQuery | undefined> = ref();
 
 const api = shallowRef(useApi());
@@ -65,19 +64,7 @@ function search(offset = 0) {
 }
 
 function _search(req: SequenceSearchRequest) {
-  if (req.type === "protein" && req.mode === "exact") {
-    query.value = {
-      field: "protein",
-      op: "in",
-      value: req.sequences,
-    };
-  } else if (req.type === "dna" && req.mode === "exact") {
-    query.value = {
-      field: "sorf",
-      op: "in",
-      value: req.sequences,
-    };
-  } else if (req.type === "id") {
+  if (req.type === "id") {
     query.value = {
       field: "id",
       op: "in",
@@ -124,7 +111,7 @@ onMounted(init);
 <template>
   <main class="container pt-5">
     <SequenceFamilySelector name-prefix="search" />
-    <h2>WIP</h2>
+    <FamilySelectionPanel @search="_search" :submitting="searchState.loading" />
     <ResultsPanel
       ref="resultsPanel"
       v-if="query"
