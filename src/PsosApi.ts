@@ -105,12 +105,12 @@ async function getPsosSorfdbResult(
       return psosResultFiles;
     } catch (e) {
       console.log(e);
-      return e;
+      //return e;
     }
   }
 }
 
-async function getPsosSorfdbResultFamilies(
+async function getPsosSorfdbResultFamilies2(
   resultFiles: string[],
   psosId: string,
 ): Promise<string[]> {
@@ -144,8 +144,38 @@ async function getPsosSorfdbResultFamilies(
   return familyIds;
 }
 
+async function getPsosSorfdbResultFamilies(
+  resultFiles: string[],
+  psosId: string,
+): Promise<string[]> {
+  const familyIds: string[] = [];
+  for (const f of resultFiles) {
+    try {
+      const request: RequestInfo = new Request(
+        "https://psos.computational.bio/api/v1/job/" + psosId + "/file/" + f,
+      );
+      const psosResultsFileResponse = await fetch(request);
+      const psosResultsFile = await toJson(psosResultsFileResponse);
+      const hits = psosResultsFile.computations;
+      for (const hit of hits) {
+        const hr = hit.results;
+        hr.forEach((hmmHit: Record<string, Record<string, string>>) => {
+          const hrt = hmmHit.target;
+          const hrtm = hrt.name;
+          familyIds.push(hrtm);
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      //return e;
+    }
+  }
+  return familyIds;
+}
+
 async function getPsosSorfdbHits(proteins: string): Promise<string[]> {
   const psosId = await getPsosSorfdbId(proteins);
+  console.log(psosId);
   const psosResults = await getPsosSorfdbResult(psosId);
   const familyIds: string[] = await getPsosSorfdbResultFamilies(
     psosResults,
