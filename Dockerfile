@@ -5,7 +5,7 @@ WORKDIR /src
 RUN apk update && npm install
 RUN npm run build-only --omit=dev
 
-FROM nginx:alpine3.18-slim
+FROM nginx:alpine3.19-slim
 
 LABEL org.opencontainers.image.authors="julian.hahnfeld@computational.bio.uni-giessen.de"
 LABEL org.opencontainers.image.url='https://github.com/jhahnfeld/sorfdb-web'
