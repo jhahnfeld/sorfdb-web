@@ -96,7 +96,7 @@ export function resultTableColums() {
 
 export function clusterResultTableColums() {
   return [
-    { group: "General", label: "Family ID", key: "id", link: false },
+    { group: "General", label: "Family ID", key: "id", link: true },
     { group: "General", label: "Function", key: "function" },
     {
       group: "Statisitcs",

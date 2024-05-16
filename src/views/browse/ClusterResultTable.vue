@@ -67,7 +67,7 @@ function extractValue(entry: ClusterSearchEntry, c: Option) {
         <tr>
           <td v-for="c of visibleColumns" :key="c.key" scope="row">
             <template v-if="c.link">
-              <router-link :to="{ name: 'result', params: { id: entry.id } }">
+              <router-link :to="{ name: 'family', params: { id: entry.id } }">
                 {{ extractValue(entry, c) }}
               </router-link>
             </template>

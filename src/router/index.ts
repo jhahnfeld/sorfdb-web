@@ -62,6 +62,12 @@ const router = createRouter({
       props: true,
     },
     {
+      path: "/family/:id(.+)",
+      name: "family",
+      component: () => import("../views/show-results/ClusterResultView.vue"),
+      props: true,
+    },
+    {
       path: "/composition",
       name: "composition",
       component: () => import("../views/DatasetCompositionView.vue"),
