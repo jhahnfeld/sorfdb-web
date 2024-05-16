@@ -14,9 +14,10 @@ import type { Option } from "@/components/CheckboxOption";
 import { ref, type Ref } from "vue";
 import { clusterResultTableColums as resultTableColums } from "../browse/ResultColumns";
 import ResultsPanel from "@/views/browse/ClusterResultsPanel.vue";
-import { type SequenceSearchRequest } from "./SequenceSearchRequest";
 import FamilySelectionPanel from "./FamilySelectionPanel.vue";
 import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
+import { getPsosSorfdbHits } from "@/PsosApi";
+import { fastaFromSequences } from "@/fasta-handler";
 
 const pageState = usePageState();
 const searchState = usePageState();
@@ -63,14 +64,16 @@ function search(offset = 0) {
     .catch((err) => pageState.value.setError(err));
 }
 
-function _search(req: SequenceSearchRequest) {
-  if (req.type === "id") {
-    query.value = {
-      field: "id",
-      op: "in",
-      value: req.ids,
-    };
-  }
+async function _search(sequences: string[]) {
+  searchState.value.setState(State.Loading);
+  const hits: string[] = await getPsosSorfdbHits(fastaFromSequences(sequences));
+
+  query.value = {
+    field: "id",
+    op: "in",
+    value: hits,
+  };
+
   search();
 }
 

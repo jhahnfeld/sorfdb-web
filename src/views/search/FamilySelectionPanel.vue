@@ -60,22 +60,16 @@
 <script setup lang="ts">
 import { validateProtein, validateInputArray } from "@/search-validator";
 import { computed, ref, type PropType } from "vue";
-import {
-  extractSequencesFromFasta,
-  fastaFromSequences,
-  uniqueArray,
-} from "@/fasta-handler";
-import type { SequenceSearchRequest } from "./SequenceSearchRequest";
+import { extractSequencesFromFasta, uniqueArray } from "@/fasta-handler";
 import notificationMessage from "@/components/Notification.vue";
 import ProgressBar from "@/components/ProgressBar.vue";
 import readFileWithProgress from "@/read-file-with-progress";
-import { getPsosSorfdbHits } from "@/PsosApi";
 
 const props = defineProps({
   submitting: { type: Boolean as PropType<boolean>, required: true },
 });
 const emit = defineEmits<{
-  (e: "search", v: SequenceSearchRequest): void;
+  (e: "search", v: string[]): void;
 }>();
 
 const sequence = ref("");
@@ -202,15 +196,7 @@ function updateSequenceFile(evt: Event): void {
 
 const dummySubmit = () => {};
 
-const submit = async () => {
-  const hits: string[] = await getPsosSorfdbHits(
-    fastaFromSequences(sequences.value),
-  );
-  console.log("Search input");
-  console.log(hits);
-  emit("search", {
-    ids: hits,
-    type: "id",
-  });
+const submit = () => {
+  emit("search", sequences.value);
 };
 </script>
