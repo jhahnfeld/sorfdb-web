@@ -118,7 +118,6 @@ function parseBlastResults(
         if (
           hitIdentity >= identityThreshold &&
           hit.qcovs >= coverageThreshold &&
-          hsp.qcovhsp >= coverageThreshold &&
           scov >= coverageThreshold
         ) {
           subjectIds.add(hit.id);
