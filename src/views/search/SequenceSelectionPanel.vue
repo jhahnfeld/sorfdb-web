@@ -199,6 +199,15 @@ const props = defineProps({
 });
 const emit = defineEmits<{
   (e: "search", v: SequenceSearchRequest): void;
+  (
+    e: "blastSearch",
+    v: {
+      seqs: string[];
+      mode: string;
+      id: number;
+      cov: number;
+    },
+  ): void;
 }>();
 
 const sequenceMode = [
@@ -390,21 +399,12 @@ const submit = async () => {
         type: "protein",
       });
     } else if (activeAlignMode.value === "Blast") {
-      const blastResults = await blastRequest(
-        "blastp",
-        fastaFromSequences(sequences.value),
-      );
-      if (blastResults != null) {
-        const blastHitIds = parseBlastResults(
-          blastResults,
-          identity.value,
-          coverage.value,
-        );
-        emit("search", {
-          ids: [...blastHitIds],
-          type: "id",
-        });
-      }
+      emit("blastSearch", {
+        seqs: sequences.value,
+        mode: "blastp",
+        id: identity.value,
+        cov: coverage.value,
+      });
     }
   } else if (activeSequenceMode.value === "Nucleotide sequence(s)") {
     if (activeAlignMode.value === "Exact") {
@@ -414,21 +414,12 @@ const submit = async () => {
         type: "dna",
       });
     } else if (activeAlignMode.value === "Blast") {
-      const blastResults = await blastRequest(
-        "blastx",
-        fastaFromSequences(sequences.value),
-      );
-      if (blastResults != null) {
-        const blastHitIds = parseBlastResults(
-          blastResults,
-          identity.value,
-          coverage.value,
-        );
-        emit("search", {
-          ids: [...blastHitIds],
-          type: "id",
-        });
-      }
+      emit("blastSearch", {
+        seqs: sequences.value,
+        mode: "blastx",
+        id: identity.value,
+        cov: coverage.value,
+      });
     }
   } else if (activeSequenceMode.value === "Ids") {
     emit("search", {

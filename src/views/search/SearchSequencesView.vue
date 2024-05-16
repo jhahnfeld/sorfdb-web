@@ -19,6 +19,8 @@ import ResultsPanel from "../browse/ResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
 import SequenceSelectionPanel from "./SequenceSelectionPanel.vue";
 import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
+import { blastRequest, parseBlastResults } from "@/blastApi";
+import { fastaFromSequences } from "@/fasta-handler";
 
 const route = useRoute();
 const pageState = usePageState();
@@ -64,6 +66,33 @@ function search(offset = 0) {
       pagination.value.total = r.total;
     })
     .catch((err) => pageState.value.setError(err));
+}
+
+async function blastSearch(blastParams: {
+  seqs: string[];
+  mode: string;
+  id: number;
+  cov: number;
+}) {
+  searchState.value.setState(State.Loading);
+  const blastResults = await blastRequest(
+    blastParams.mode,
+    fastaFromSequences(blastParams.seqs),
+  );
+  if (blastResults != null) {
+    let cov: number = blastParams.cov;
+    // 100% coverage of the protein are reported as 33% for the nucleotide sequence
+    if (blastParams.mode == "blastx") {
+      cov = blastParams.cov / 3;
+    }
+    const blastHitIds = parseBlastResults(blastResults, blastParams.id, cov);
+    _search({
+      ids: [...blastHitIds],
+      type: "id",
+    });
+  } else {
+    searchState.value.setState(State.Main);
+  }
 }
 
 function _search(req: SequenceSearchRequest) {
@@ -129,6 +158,7 @@ onMounted(init);
 
     <SequenceSelectionPanel
       @search="_search"
+      @blast-search="blastSearch"
       :submitting="searchState.loading"
     />
     <ResultsPanel
