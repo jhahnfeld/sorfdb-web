@@ -2,7 +2,7 @@ FROM node:current-alpine3.19 as builder
 
 COPY . /src
 WORKDIR /src
-RUN apk update && npm update -g npm && npm install
+RUN apk upgrade --no-cache && npm update -g npm && npm install
 RUN npm run build-only --omit=dev
 
 FROM nginx:alpine3.19-slim
@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.documentation='https://github.com/jhahnfeld/sorfd
 LABEL org.opencontainers.image.title='sORFdb Web Frontend'
 LABEL org.opencontainers.image.description='Web frontend for sORFdb'
 
-RUN apk update
+RUN apk upgrade --no-cache
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /src/dist /usr/share/nginx/html
