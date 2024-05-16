@@ -34,10 +34,11 @@
           data-bs-parent="#accordionExample"
         >
           <div class="accordion-body">
-            If you are looking for sORF or small protein database for bacteria
+            If you are looking for a sORF or small protein database for bacteria
             you will find in sORFdb a comprehensive, taxonomy independent and
-            quality-filtered database with web based search and browse functions
-            as well as downloadable sequence and small protein family data.
+            quality-filtered database. It offers specialized web-based search
+            and browse functions as well as downloadable sequence and small
+            protein family data for local use.
           </div>
         </div>
       </div>
@@ -62,11 +63,11 @@
           data-bs-parent="#accordionExample"
         >
           <div class="accordion-body">
-            If you cannot find your protein with the exact search you can use
+            If you cannot find your protein with the exact search, you can use
             the BLAST based search which allows you to specify identity and
             coverage thresholds. Alternatively, you can use the HMM based small
-            protein family search. If all searches do not include your protein
-            it is highly likely not present in the current version of the
+            protein family search. If all searches fail to find your protein, it
+            is likely that there are no homologs in the current version of the
             database.
           </div>
         </div>
@@ -94,8 +95,8 @@
         >
           <div class="accordion-body">
             You can use the HMMs of the small protein families to identify small
-            proteins or you can use the sequence data for a sequence search i.e.
-            with BLAST.
+            proteins or you can use the sequence data for a sequence search,
+            e.g. with BLAST.
           </div>
         </div>
       </div>
