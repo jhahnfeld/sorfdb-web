@@ -4,7 +4,7 @@
   <div class="page-body flex-grow-1">
     <div class="container">
       <h2 style="margin-top: 0.5em">Documentation</h2>
-      <h3>Search <router-link to="/search">&#128279;</router-link></h3>
+      <h3>Search <router-link to="/search/sequence">&#128279;</router-link></h3>
       The search function of sORFdb can be used to search for sORF and small
       protein sequences in the database, as well as for the search for entry IDs
       to look up one ore more entries directly. For small proteins a search for
@@ -24,7 +24,7 @@
       which where created from clusters of all non-redundatnt small proteins
       with up 50 amino acids. For the search hmmscan of the HMMER suite is used.
       <h3 style="margin-top: 0.5em">
-        Browse <router-link to="/browse">&#128279;</router-link>
+        Browse <router-link to="/browse/sequence">&#128279;</router-link>
       </h3>
       The browse function allows users to view the contents of the database and
       filter them according to various criteria. The view of the database can be
