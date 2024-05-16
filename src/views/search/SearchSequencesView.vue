@@ -80,12 +80,11 @@ async function blastSearch(blastParams: {
     fastaFromSequences(blastParams.seqs),
   );
   if (blastResults != null) {
-    let cov: number = blastParams.cov;
-    // 100% coverage of the protein are reported as 33% for the nucleotide sequence
-    if (blastParams.mode == "blastx") {
-      cov = blastParams.cov / 3;
-    }
-    const blastHitIds = parseBlastResults(blastResults, blastParams.id, cov);
+    const blastHitIds = parseBlastResults(
+      blastResults,
+      blastParams.id,
+      blastParams.cov,
+    );
     _search({
       ids: [...blastHitIds],
       type: "id",
