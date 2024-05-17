@@ -36,9 +36,10 @@
           <div class="accordion-body">
             If you are looking for a sORF or small protein database for bacteria
             you will find in sORFdb a comprehensive, taxonomy independent and
-            quality-filtered database. It offers specialized web-based search
-            and browse functions as well as downloadable sequence and small
-            protein family data for local use.
+            quality-filtered source for sequence data, functional descriptions
+            and protein properies. It offers specialized web-based search and
+            browse functions as well as downloadable sequence and small protein
+            family data for local use.
           </div>
         </div>
       </div>
