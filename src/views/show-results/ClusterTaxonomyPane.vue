@@ -53,16 +53,23 @@ function formatTaxonomyForPlotly(
       level.label !== null &&
       Array.from(parentMap.values()).includes(level.label)
     ) {
-      parentMap.set(level.id, level.label + "*");
-      data.labels.push(level.label + "*");
-      data.parents.push(parentMap.get(level.parent));
-      data.values.push(level.value);
+      let isUnique: boolean = false;
+      let tmpLabel: string = level.label + "*";
+      while (!isUnique) {
+        if (Array.from(parentMap.values()).includes(tmpLabel)) {
+          tmpLabel = tmpLabel + "*";
+        } else {
+          parentMap.set(level.id, tmpLabel);
+          data.labels.push(tmpLabel);
+          isUnique = true;
+        }
+      }
     } else {
       parentMap.set(level.id, level.label);
       data.labels.push(level.label);
-      data.parents.push(parentMap.get(level.parent));
-      data.values.push(level.value);
     }
+    data.parents.push(parentMap.get(level.parent));
+    data.values.push(level.value);
   }
 
   for (let i = data.labels.length; i > 0; i--) {
