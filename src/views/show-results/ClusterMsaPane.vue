@@ -9,7 +9,9 @@ const props = defineProps({
 });
 
 const alignment = computed(() =>
-  fastaFromSequences(extractSequencesFromFasta(props.entry.alignment, 101)),
+  fastaFromSequences(
+    extractSequencesFromFasta(props.entry.alignment, Infinity),
+  ),
 );
 </script>
 
