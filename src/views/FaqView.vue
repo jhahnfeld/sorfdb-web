@@ -111,7 +111,7 @@
             aria-expanded="false"
             aria-controls="collapseFour"
           >
-            4. What are the recommended BLAST parameters?
+            4. What are the recommended BLAST parameters for a local search?
           </button>
         </h2>
         <div
