@@ -16,7 +16,7 @@
         A database for small proteins &amp; sORFs in bacteria
       </h3>
     </div>
-
+    <!--
     <div class="container-fluid" style="margin-top: 2em">
       <div class="row">
         <div class="col-xs-12 col-md-4"></div>
@@ -75,6 +75,53 @@
               Icon4
             </router-link>
           </h2>
+        </div>
+      </div>
+    </div>
+    -->
+    <div class="container-fluid" style="margin-top: 2em">
+      <div class="row">
+        <div class="col-xs-12 col-md-6 text-center">
+          <button type="button" class="btn btn-primary">
+            <router-link
+              to="/search/sequence"
+              style="color: white; text-decoration: none"
+            >
+              <h2>Search Sequences</h2>
+            </router-link>
+          </button>
+        </div>
+        <div class="col-xs-12 col-md-6 text-center">
+          <button type="button" class="btn btn-primary">
+            <router-link
+              to="/browse/sequence"
+              style="color: white; text-decoration: none"
+            >
+              <h2>Browse Sequences</h2>
+            </router-link>
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-md-6 mt-3 text-center">
+          <button type="button" class="btn btn-primary">
+            <router-link
+              to="/search/family"
+              style="color: white; text-decoration: none"
+            >
+              <h2>Search Families</h2>
+            </router-link>
+          </button>
+        </div>
+        <div class="col-xs-12 col-md-6 mt-3 text-center">
+          <button type="button" class="btn btn-primary">
+            <router-link
+              to="/browse/family"
+              style="color: white; text-decoration: none"
+            >
+              <h2>Browse Families</h2>
+            </router-link>
+          </button>
         </div>
       </div>
     </div>
