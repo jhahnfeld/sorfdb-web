@@ -9,7 +9,7 @@
           class="float-end version"
           style="font-size: 0.3em; color: gray; padding-right: 1.5em"
         >
-          (DB: v0.1)
+          (DB: v1.0)
         </span>
       </h1>
       <h3 style="text-align: left; color: gray">
@@ -108,10 +108,10 @@
       criteria such as taxonomy, sequence length and physicochemical properties.
       <br />
       If you want to know more about the usage of the search and browse
-      functions look here: <router-link to="/about">Documentation</router-link
-      ><br />
+      functions look here:
+      <router-link to="/documentation">Documentation</router-link><br />
       Some of your questions might also be answered in the
-      <router-link to="/about">FAQ</router-link>.
+      <router-link to="/faq">FAQ</router-link>.
     </p>
   </main>
 </template>
