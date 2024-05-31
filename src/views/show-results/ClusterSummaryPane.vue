@@ -5,6 +5,7 @@ import ClusterStatistic from "./ClusterStatistic.vue";
 import Krona from "./ClusterTaxonomyPane.vue";
 import MsaPane from "./ClusterMsaPane.vue";
 import type { ClusterEntry } from "@/model/ClusterSearchResult.ts";
+import { extractSequencesFromFasta, fastaFromSequences } from "@/fasta-handler";
 
 const props = defineProps({
   id: { type: String },
@@ -59,7 +60,13 @@ function copyToClipboard(text: string): void {
           <button
             type="button"
             class="btn btn-secondary"
-            @click="copyToClipboard(entry.alignment)"
+            @click="
+              copyToClipboard(
+                fastaFromSequences(
+                  extractSequencesFromFasta(entry.alignment, Infinity),
+                ),
+              )
+            "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
