@@ -16,7 +16,7 @@
         A database for small proteins &amp; sORFs in bacteria
       </h3>
     </div>
-    <!--
+
     <div class="container-fluid" style="margin-top: 2em">
       <div class="row">
         <div class="col-xs-12 col-md-4"></div>
@@ -28,57 +28,49 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12 col-md-4">
+        <div class="col-xs-12 col-md-4 mt-2 mb-2">
           <h2 style="text-align: center; margin-top: 1em">Sequences</h2>
         </div>
-        <div class="col-xs-12 col-md-4">
-          <h2 style="text-align: center; margin-top: 1em">
-            <router-link
-              to="/search/sequence"
-              style="color: black; text-decoration: none"
-            >
-              Icon1
-            </router-link>
-          </h2>
+        <div class="col-xs-12 col-md-4 mt-2 mb-2 text-center">
+          <router-link
+            to="/search/sequence"
+            style="color: black; text-decoration: none"
+          >
+            <img src="@/assets/images/Search_1.svg" />
+          </router-link>
         </div>
-        <div class="col-xs-12 col-md-4">
-          <h2 style="text-align: center; margin-top: 1em">
-            <router-link
-              to="/browse/sequence"
-              style="color: black; text-decoration: none"
-            >
-              Icon2
-            </router-link>
-          </h2>
+        <div class="col-xs-12 col-md-4 mt-2 mb-2 text-center">
+          <router-link
+            to="/browse/sequence"
+            style="color: black; text-decoration: none"
+          >
+            <img src="@/assets/images/Browse_1.svg" />
+          </router-link>
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12 col-md-4">
+        <div class="col-xs-12 mt-3 col-md-4 mt-2 mb">
           <h2 style="text-align: center; margin-top: 1em">Families</h2>
         </div>
-        <div class="col-xs-12 col-md-4">
-          <h2 style="text-align: center; margin-top: 1em">
-            <router-link
-              to="/search/family"
-              style="color: black; text-decoration: none"
-            >
-              Icon3
-            </router-link>
-          </h2>
+        <div class="col-xs-12 col-md-4 mt-2 mb-2 text-center">
+          <router-link
+            to="/search/family"
+            style="color: black; text-decoration: none"
+          >
+            <img src="@/assets/images/Search_2.svg" />
+          </router-link>
         </div>
-        <div class="col-xs-12 col-md-4">
-          <h2 style="text-align: center; margin-top: 1em">
-            <router-link
-              to="/browse/family"
-              style="color: black; text-decoration: none"
-            >
-              Icon4
-            </router-link>
-          </h2>
+        <div class="col-xs-12 col-md-4 mt-2 mb-2 text-center">
+          <router-link
+            to="/browse/family"
+            style="color: black; text-decoration: none"
+          >
+            <img src="@/assets/images/Browse_1.svg" />
+          </router-link>
         </div>
       </div>
     </div>
-    -->
+    <!--
     <div class="container-fluid" style="margin-top: 2em">
       <div class="row">
         <div class="col-xs-12 col-md-6 text-center">
@@ -125,7 +117,7 @@
         </div>
       </div>
     </div>
-
+    -->
     <h3 style="margin-top: 3em">About sORFdb</h3>
     <p style="text-align: justify">
       sORFdb is a dedicated database for short open reading frames (sORFs) and
