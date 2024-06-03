@@ -65,7 +65,7 @@
             to="/browse/family"
             style="color: black; text-decoration: none"
           >
-            <img src="@/assets/images/Browse_1.svg" />
+            <img src="@/assets/images/Browse_2.svg" />
           </router-link>
         </div>
       </div>
