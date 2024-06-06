@@ -2,10 +2,7 @@
   <div class="container">
     <footer class="">
       <div class="d-flex flex-column flex-xl-row justify-content-center">
-        <a
-          href="https://www.uni-giessen.de/de/fbz/fb08/Inst/bioinformatik/"
-          target="_blank"
-        >
+        <a href="https://www.uni-giessen.de/de/fbz/fb08/Inst/bioinformatik/">
           <img src="@/assets/images/CB.AG_Logo.svg" class="logo" />
         </a>
         <a href="https://www.denbi.de/">
