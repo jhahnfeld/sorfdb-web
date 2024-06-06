@@ -10,8 +10,8 @@
       or more entries directly. There are two types of sequence search and a
       small protein family search available:
       <h4 style="margin-top: 0.5em">Exact search</h4>
-      The fast search performs an instant exact search for the given sORF or
-      small protein sequences. This means that only entries which are completely
+      The exact search performs an instant search for the given sORF or small
+      protein sequences. This means that only entries which are completely
       identical will be reported.
       <h4 style="margin-top: 0.5em">BLAST search</h4>
       The BLAST search performs a BLAST-based sequence similarity search
