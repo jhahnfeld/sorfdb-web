@@ -32,9 +32,7 @@
           Examples: MSTFQALMLMLAIGSFIIALLTYIEKIDLP or
         </p>
         <pre>
-          >SwissProt|A0A2K4Z9J5|BSRE_BACSU
-          MSTFQALMLMLAIGSFIIALLTYIEKIDLP
-        </pre>
+>SwissProt|A0A2K4Z9J5|BSRE_BACSU<br>MSTFQALMLMLAIGSFIIALLTYIEKIDLP</pre>
       </template>
       <template v-if="activeSequenceMode === 'Nucleotide sequence(s)'">
         <textarea
@@ -51,25 +49,23 @@
           Example: ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG or
         </p>
         <pre>
-          >GenBank|ABFMQO020000063.1|MCU9633280.1
-          ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG
+>GenBank|ABFMQO020000063.1|MCU9633280.1<br>ATGACACGCGTTCAATTTAAACACCACCATCATCACCATCATCCTGACTAG
         </pre>
       </template>
-      <template v-if="activeSequenceMode === 'Ids'">
+      <template v-if="activeSequenceMode === 'sORFdb IDs'">
         <textarea
           class="form-control form-control-lg"
           type="text"
           v-model="sequence"
-          placeholder="Paste your Ids here or upload them in a TXT file (one Id per line)..."
-          aria-label="Paste your Ids here (one Id per line)..."
+          placeholder="Paste your sORFdb IDs here or upload them in a TXT file (one ID per line)..."
+          aria-label="Paste your sORFdb IDs here (one Id per line)..."
           autofocus="true"
           :disabled="sequenceFile != null && sequence.length == 0"
           rows="3"
         ></textarea>
         <p style="margin-top: 1em">Examples:</p>
         <pre>
-          SwissProt|A0A2K4Z9J5|BSRE_BACSU
-          GenBank|AABOTI020000010.1|MPA92906.1
+SwissProt|A0A2K4Z9J5|BSRE_BACSU<br>GenBank|AABOTI020000010.1|MPA92906.1
         </pre>
       </template>
       <div class="mb-2 pb-2">
@@ -105,49 +101,50 @@
           </label>
         </div>        
       -->
-      <ul class="nav nav-underline" style="margin-top: 1em">
-        <li class="nav-item">
-          <span class="nav-link disabled">Search mode</span>
-        </li>
-        <li v-for="mode of alignModes" :key="mode" class="nav-item">
-          <button
-            class="nav-link"
-            :class="{ active: mode == activeAlignMode }"
-            aria-current="page"
-            @click="activeAlignMode = mode"
-            :disabled="mode == 'Blast' && activeSequenceMode == 'Ids'"
-          >
-            {{ mode }}
-          </button>
-        </li>
-      </ul>
+      <template v-if="activeSequenceMode !== 'sORFdb IDs'">
+        <ul class="nav nav-underline" style="margin-top: 1em">
+          <li class="nav-item">
+            <span class="nav-link disabled"><h5>Search mode</h5></span>
+          </li>
+          <li v-for="mode of alignModes" :key="mode" class="nav-item">
+            <button
+              class="nav-link"
+              :class="{ active: mode == activeAlignMode }"
+              aria-current="page"
+              @click="activeAlignMode = mode"
+            >
+              {{ mode }}
+            </button>
+          </li>
+        </ul>
 
-      <template v-if="activeAlignMode === 'Blast'">
-        <h5 class="mb-2">BLAST search parameters</h5>
-        <div class="mb-3">
-          <label class="form-label" for="identity">
-            Identity
-            <input
-              class="form-control"
-              type="number"
-              min="30"
-              max="100"
-              v-model.number="identity"
-              id="identity"
-            />
-          </label>
-          <label class="form-label" for="coverage">
-            Coverage
-            <input
-              class="form-control"
-              type="number"
-              min="30"
-              max="100"
-              v-model.number="coverage"
-              id="coverage"
-            />
-          </label>
-        </div>
+        <template v-if="activeAlignMode === 'Blast'">
+          <h5 class="mb-2">BLAST search parameters</h5>
+          <div class="mb-3">
+            <label class="form-label" for="identity">
+              Identity
+              <input
+                class="form-control"
+                type="number"
+                min="30"
+                max="100"
+                v-model.number="identity"
+                id="identity"
+              />
+            </label>
+            <label class="form-label" for="coverage">
+              Coverage
+              <input
+                class="form-control"
+                type="number"
+                min="30"
+                max="100"
+                v-model.number="coverage"
+                id="coverage"
+              />
+            </label>
+          </div>
+        </template>
       </template>
 
       <div class="d-flex justify-content-end mb-5">
@@ -183,12 +180,7 @@ import {
   validateInputArray,
 } from "@/search-validator";
 import { computed, ref, type PropType } from "vue";
-import {
-  extractSequencesFromFasta,
-  fastaFromSequences,
-  uniqueArray,
-} from "@/fasta-handler";
-import { blastRequest, parseBlastResults } from "@/blastApi";
+import { extractSequencesFromFasta, uniqueArray } from "@/fasta-handler";
 import type { SequenceSearchRequest } from "./SequenceSearchRequest";
 import notificationMessage from "@/components/Notification.vue";
 import ProgressBar from "@/components/ProgressBar.vue";
@@ -213,7 +205,7 @@ const emit = defineEmits<{
 const sequenceMode = [
   "Protein sequence(s)",
   "Nucleotide sequence(s)",
-  "Ids",
+  "sORFdb IDs",
 ] as const;
 const maxSequenceLengths: Record<string, number> = {
   "Protein sequence(s)": 143,
@@ -248,14 +240,25 @@ const sequences = computed<string[]>(() => {
     return extractSequencesFromFasta(
       sequence.value,
       maxSequenceLengths[activeSequenceMode.value],
+    ).filter(
+      (x) =>
+        x.length > 0 && x.length < maxSequenceLengths[activeSequenceMode.value],
     );
   } else if (sequence.value.length > 0) {
     if ((sequence.value.match(/\n/) || []).length == 0) {
-      return [sequence.value];
-    } else {
-      return uniqueArray(sequence.value.split("\n")).filter(
-        (x) => x.length > 0,
+      return [sequence.value.trim()].filter(
+        (x) =>
+          x.length > 0 &&
+          x.length < maxSequenceLengths[activeSequenceMode.value],
       );
+    } else {
+      return uniqueArray(sequence.value.split("\n"))
+        .map((x) => x.trim())
+        .filter(
+          (x) =>
+            x.length > 0 &&
+            x.length < maxSequenceLengths[activeSequenceMode.value],
+        );
     }
   } else if (sequenceFileContent.value.length > 0) {
     if (
@@ -265,11 +268,19 @@ const sequences = computed<string[]>(() => {
       return extractSequencesFromFasta(
         sequenceFileContent.value,
         maxSequenceLengths[activeSequenceMode.value],
+      ).filter(
+        (x) =>
+          x.length > 0 &&
+          x.length < maxSequenceLengths[activeSequenceMode.value],
       );
     } else {
-      return uniqueArray(sequenceFileContent.value.split("\n")).filter(
-        (x) => x.length > 0,
-      );
+      return uniqueArray(sequenceFileContent.value.split("\n"))
+        .map((x) => x.trim())
+        .filter(
+          (x) =>
+            x.length > 0 &&
+            x.length < maxSequenceLengths[activeSequenceMode.value],
+        );
     }
   } else {
     return [];
@@ -297,6 +308,13 @@ const isValid = computed(() => {
       error: "Please use the input field or an uploaded file not both!",
     };
   }
+  if (sequence.value.length > 0 && sequences.value.length == 0) {
+    return {
+      valid: false,
+      error:
+        "All submitted sequences appear to be invalid. This means that they are either too long or too short.",
+    };
+  }
   if (sequence.value.length > 0) {
     if (
       (activeSequenceMode.value === "Protein sequence(s)" &&
@@ -315,7 +333,7 @@ const isValid = computed(() => {
     ) {
       return { valid: true, error: "" };
     } else if (
-      activeSequenceMode.value === "Ids" &&
+      activeSequenceMode.value === "sORFdb IDs" &&
       validateInputArray(sequences.value, matchesIdScheme)
     ) {
       return { valid: true, error: "" };
@@ -337,7 +355,7 @@ const isValid = computed(() => {
     ) {
       return { valid: true, error: "" };
     } else if (
-      activeSequenceMode.value === "Ids" &&
+      activeSequenceMode.value === "sORFdb IDs" &&
       validateInputArray(sequences.value, matchesIdScheme)
     ) {
       return { valid: true, error: "" };
@@ -391,6 +409,7 @@ function updateSequenceFile(evt: Event): void {
 const dummySubmit = () => {};
 
 const submit = async () => {
+  console.log(sequences.value);
   if (activeSequenceMode.value === "Protein sequence(s)") {
     if (activeAlignMode.value === "Exact") {
       emit("search", {
@@ -421,7 +440,7 @@ const submit = async () => {
         cov: coverage.value,
       });
     }
-  } else if (activeSequenceMode.value === "Ids") {
+  } else if (activeSequenceMode.value === "sORFdb IDs") {
     emit("search", {
       ids: sequences.value,
       type: "id",
