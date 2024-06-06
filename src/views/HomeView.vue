@@ -139,7 +139,7 @@
       <br />
       Read more about sORFdb here: <router-link to="/about">About</router-link>
     </p>
-    <h4>Usage</h4>
+    <h3>Usage</h3>
     <p style="text-align: justify">
       To access the database an instant search and a BLAST search for sORFs and
       small protein sequences is available. The browse function provides a
