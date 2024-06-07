@@ -13,10 +13,8 @@
       ></textarea>
       <p style="margin-top: 1em">Examples: MSTFQALMLMLAIGSFIIALLTYIEKIDLP or</p>
       <pre>
-          >SwissProt|A0A2K4Z9J5|BSRE_BACSU
-          MSTFQALMLMLAIGSFIIALLTYIEKIDLP
-        </pre
-      >
+>SwissProt|A0A2K4Z9J5|BSRE_BACSU<br>MSTFQALMLMLAIGSFIIALLTYIEKIDLP
+        </pre>
       <div class="mb-2 pb-2">
         <input
           class="form-control"
