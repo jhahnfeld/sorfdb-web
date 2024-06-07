@@ -11,9 +11,7 @@ import usePageState, { State } from "@/PageState";
 import { useApi } from "@/SorfdbApi";
 import { onMounted, shallowRef } from "vue";
 import type { Option } from "@/components/CheckboxOption";
-import router from "@/router";
-import { useRoute } from "vue-router";
-import { computed, ref, type Ref } from "vue";
+import { ref, type Ref } from "vue";
 import { resultTableColums } from "../browse/ResultColumns";
 import ResultsPanel from "../browse/ResultsPanel.vue";
 import { type SequenceSearchRequest } from "./SequenceSearchRequest";
@@ -22,11 +20,14 @@ import SequenceFamilySelector from "@/components/SequenceFamilySelector.vue";
 import { blastRequest, parseBlastResults } from "@/blastApi";
 import { fastaFromSequences } from "@/fasta-handler";
 
-const route = useRoute();
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<SorfdbEntry[]> = ref([]);
-const query: Ref<InQuery | undefined> = ref();
+const query: Ref<InQuery> = ref({
+  field: "protein",
+  op: "in",
+  value: [],
+});
 
 const api = shallowRef(useApi());
 const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });

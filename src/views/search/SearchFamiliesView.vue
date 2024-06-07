@@ -22,7 +22,11 @@ import { fastaFromSequences } from "@/fasta-handler";
 const pageState = usePageState();
 const searchState = usePageState();
 const entries: Ref<ClusterSearchEntry[]> = ref([]);
-const query: Ref<InQuery | undefined> = ref();
+const query: Ref<InQuery> = ref({
+  field: "id",
+  op: "in",
+  value: [],
+});
 
 const api = shallowRef(useApi());
 const pagination: Ref<PaginationData> = ref({ limit: 10, offset: 0, total: 0 });

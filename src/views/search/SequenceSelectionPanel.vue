@@ -409,7 +409,6 @@ function updateSequenceFile(evt: Event): void {
 const dummySubmit = () => {};
 
 const submit = async () => {
-  console.log(sequences.value);
   if (activeSequenceMode.value === "Protein sequence(s)") {
     if (activeAlignMode.value === "Exact") {
       emit("search", {
