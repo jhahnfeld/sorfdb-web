@@ -14,12 +14,15 @@
       For technical questions and bug reports, we happily accept issues on
       <a href="https://github.com/jhahnfeld/sorfdb-web" target="_blank"
         >GitHub</a
-      >. <br />
+      >.
+    </p>
+    <!--
+     <br />
       General contact and questions:
       <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
         >sorfdb@computational.bio.uni-giessen.de</a
       >
-    </p>
+    -->
     <p>
       sORFdb is a specialized (unlike GenBank, Swiss-Prot and UniProt), taxonomy
       independent (unlike SmProt) and quality-filtered (unlike GenBank and
