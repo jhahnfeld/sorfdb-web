@@ -210,6 +210,7 @@ const sequenceMode = [
 const maxSequenceLengths: Record<string, number> = {
   "Protein sequence(s)": 143,
   "Nucleotide sequence(s)": 433,
+  "sORFdb IDs": 200,
 };
 const activeSequenceMode = ref<(typeof sequenceMode)[number]>(sequenceMode[0]);
 const alignModes = ["Exact", "Blast"] as const;
