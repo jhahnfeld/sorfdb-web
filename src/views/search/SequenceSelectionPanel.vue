@@ -126,10 +126,12 @@ SwissProt|A0A2K4Z9J5|BSRE_BACSU<br>GenBank|AABOTI020000010.1|MPA92906.1
               <input
                 class="form-control"
                 type="number"
-                min="30"
+                min="1"
                 max="100"
                 v-model.number="identity"
                 id="identity"
+                required
+                pattern="\d*"
               />
             </label>
             <label class="form-label" for="coverage">
@@ -137,10 +139,12 @@ SwissProt|A0A2K4Z9J5|BSRE_BACSU<br>GenBank|AABOTI020000010.1|MPA92906.1
               <input
                 class="form-control"
                 type="number"
-                min="30"
+                min="1"
                 max="100"
                 v-model.number="coverage"
                 id="coverage"
+                required
+                pattern="\d*"
               />
             </label>
           </div>
@@ -236,6 +240,10 @@ function allowedFileTypes(mode: string): string {
   }
 }
 
+function isNumber(n: any) {
+  return !isNaN(parseFloat(n)) && !isNaN(n - 0);
+}
+
 const sequences = computed<string[]>(() => {
   if (sequence.value.startsWith(">") || sequence.value.startsWith("@")) {
     return extractSequencesFromFasta(
@@ -289,6 +297,18 @@ const sequences = computed<string[]>(() => {
 });
 
 const isValid = computed(() => {
+  if (!isNumber(identity.value) || identity.value < 1 || identity.value > 100) {
+    return {
+      valid: false,
+      error: "Identity has to be a number between 1 and 100.",
+    };
+  }
+  if (!isNumber(coverage.value) || coverage.value < 1 || coverage.value > 100) {
+    return {
+      valid: false,
+      error: "Coverage has to be a number between 1 and 100.",
+    };
+  }
   if (new Blob(sequences.value).size / (1024 * 1024) >= 46) {
     return {
       valid: false,
@@ -418,6 +438,7 @@ const submit = async () => {
         type: "protein",
       });
     } else if (activeAlignMode.value === "Blast") {
+      console.log(identity.value);
       emit("blastSearch", {
         seqs: sequences.value,
         mode: "blastp",
