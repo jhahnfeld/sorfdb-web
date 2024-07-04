@@ -4,12 +4,11 @@
   <div class="page-body flex-grow-1 container">
     <h2>FAQ</h2>
     If you have a question you can ask it at
-    <a href="https://github.com/jhahnfeld/sorfdb-web" target="_blank">GitHub</a
-    >.
-    <!--or send a mail to
+    <a href="https://github.com/jhahnfeld/sorfdb-web" target="_blank">GitHub</a>
+    or send a mail to
     <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
       >sorfdb@computational.bio.uni-giessen.de</a
-    >.-->
+    >.
     <div
       style="margin-top: 1em"
       class="accordion accordion-flush"
