@@ -16,7 +16,7 @@ function hasStartCodon(codon: string): string {
 
 function hasRbs(rbs: number | null): string {
   if (rbs == 0) {
-    return "No" + rbs;
+    return "No";
   } else if (rbs == 1) {
     return "Yes";
   } else {
@@ -29,7 +29,7 @@ function hasRbs(rbs: number | null): string {
   <table>
     <tbody>
       <tr>
-        <th class="text-end">sORFdb length:</th>
+        <th class="text-end">sORF length:</th>
         <td class="ps-5">{{ entry.slen }}</td>
       </tr>
       <tr>
