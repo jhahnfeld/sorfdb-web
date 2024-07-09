@@ -5,6 +5,18 @@ interface BlastDbs {
   protein: string;
 }
 
+const BlastProfiles: Record<string, string> = {
+  blastn: "-task blastn-short -soft_masking false -evalue 1",
+  blastp:
+    "-task blastp-short -matrix BLOSUM62 -comp_based_stats 0 -soft_masking false -seg no -evalue 1",
+  blastx:
+    "-word_size 2 -gapopen 9 -gapextend 1 -threshold 16 -window_size 15 -matrix BLOSUM62 -comp_based_stats 0 -soft_masking false -seg no -evalue 1",
+  tblastx:
+    "-word_size 2 -matrix BLOSUM62 -comp_based_stats 0 -soft_masking false -seg no -evalue 1",
+  tblastn:
+    "-word_size 2 -matrix BLOSUM62 -comp_based_stats 0 -soft_masking false -seg no -evalue 1",
+};
+
 async function getBlastDbs() {
   const headers: Headers = new Headers();
   headers.set("Content-Type", "application/json");
@@ -20,6 +32,19 @@ async function getBlastDbs() {
   } else {
     alert("HTTP-Error: " + response.status);
   }
+}
+
+async function getCsrfToken(): Promise<string> {
+  return fetch("https://sorfdb.computational.bio/blast/")
+    .then((r) => r.text())
+    .then((t) => {
+      const html = new DOMParser().parseFromString(t, "text/html");
+      const token = html.querySelector("meta[name='_csrf']").content;
+      if (token === undefined || token === null) {
+        throw "Page does not contain csrf-token";
+      }
+      return token;
+    });
 }
 
 async function getBlastDbIds(): Promise<BlastDbs | undefined> {
@@ -69,11 +94,14 @@ async function blastRequest(
   queries: string,
 ): Promise<BlastJson | null> {
   const dbIds = await getBlastDbIds();
+  const token = await getCsrfToken();
   if (dbIds) {
     const formData = new FormData();
     formData.append("databases[]", dbIds.protein);
     formData.append("method", method);
     formData.append("sequence", queries);
+    formData.append("advanced", BlastProfiles[method]);
+    formData.append("_csrf", token);
 
     const request: RequestInfo = new Request(
       "https://sorfdb.computational.bio/blast/",
