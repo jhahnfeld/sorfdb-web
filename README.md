@@ -51,3 +51,9 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+## Citation
+
+If you use sORFdb in your research, please cite this paper:
+
+> Hahnfeld, J.M., Schwengers, O., Jelonek, L. et al. sORFdb – a database for sORFs, small proteins, and small protein families in bacteria. BMC Genomics 26, 110 (2025). https://doi.org/10.1186/s12864-025-11301-w
