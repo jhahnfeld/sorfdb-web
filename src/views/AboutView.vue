@@ -33,5 +33,15 @@
       database and small proteins can be interactively explored using the browse
       function. All data are freely available for download.
     </p>
+    <h3>Publication</h3>
+    <p>
+      Hahnfeld, J.M., Schwengers, O., Jelonek, L. et al. sORFdb – a database for
+      sORFs, small proteins, and small protein families in bacteria. BMC
+      Genomics 26, 110 (2025).
+      <br />
+      <a href="https://doi.org/10.1186/s12864-025-11301-w">
+        10.1186/s12864-025-11301-w
+      </a>
+    </p>
   </div>
 </template>

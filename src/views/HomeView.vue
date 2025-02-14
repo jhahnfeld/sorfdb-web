@@ -152,6 +152,13 @@
       Some of your questions might also be answered in the
       <router-link to="/faq">FAQ</router-link>.
     </p>
+    <h5>Citation</h5>
+    <p>If you use sORFdb in your research, please cite this paper:</p>
+    <pre>
+      Hahnfeld, J.M., Schwengers, O., Jelonek, L. et al. sORFdb – a database for
+      sORFs, small proteins, and small protein families in bacteria. BMC
+      Genomics 26, 110 (2025). <a href="https://doi.org/10.1186/s12864-025-11301-w"> 10.1186/s12864-025-11301-w </a>
+    </pre>
   </main>
 </template>
 
