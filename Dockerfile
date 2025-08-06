@@ -1,11 +1,11 @@
-FROM node:current-alpine3.21 as builder
+FROM node:current-alpine3.22 as builder
 
 COPY . /src
 WORKDIR /src
 RUN apk upgrade --no-cache && npm update -g npm && npm install
 RUN npm run build-only --omit=dev
 
-FROM nginx:alpine3.21-slim
+FROM nginx:alpine3.22-slim
 
 LABEL org.opencontainers.image.authors="julian.hahnfeld@computational.bio.uni-giessen.de"
 LABEL org.opencontainers.image.url='https://github.com/jhahnfeld/sorfdb-web'
