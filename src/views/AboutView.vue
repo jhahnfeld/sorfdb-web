@@ -16,7 +16,7 @@
         >GitHub</a
       >.
       <br />
-      General contact and questions:
+      General contact, feedback and questions:
       <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
         >sorfdb@computational.bio.uni-giessen.de</a
       >
