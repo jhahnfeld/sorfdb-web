@@ -20,6 +20,11 @@
       <a href="mailto:sorfdb@computational.bio.uni-giessen.de"
         >sorfdb@computational.bio.uni-giessen.de</a
       >
+      <br />
+      Service evaluation: 
+      <a href="https://www.surveymonkey.de/r/denbi-service?sc=bigi&tool=sorfdb" target="_blank"
+        >Survey &#128279;</a
+      >
     </p>
     <p>
       sORFdb is a specialized (unlike GenBank, Swiss-Prot and UniProt), taxonomy
@@ -45,3 +50,5 @@
     </p>
   </div>
 </template>
+<script setup lang="ts">
+</script>
