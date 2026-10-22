@@ -1,4 +1,5 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
 <template>
   <main class="container pt-5">
@@ -151,6 +152,12 @@
       <router-link to="/documentation">Documentation</router-link><br />
       Some of your questions might also be answered in the
       <router-link to="/faq">FAQ</router-link>.
+    </p>
+    <h3>Survey</h3>
+    <p style="text-align: justify">
+      This is an approved de.NBI service. Please help us improve by taking our short user <a href="https://www.surveymonkey.de/r/denbi-service?sc=bigi&tool=sorfdb" target="_blank"
+    >survey &#128279;</a
+    >
     </p>
     <h5>Citation</h5>
     <p>If you use sORFdb in your research, please cite this paper:</p>
