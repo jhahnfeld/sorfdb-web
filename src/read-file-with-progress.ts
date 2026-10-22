@@ -1,4 +1,4 @@
-import pako from "pako";
+import { Inflate } from "pako";
 
 /**
  * Detects if a file contains gzip content and decompresses it. If a file is not a gzip file, it is read without decompression.
@@ -13,7 +13,7 @@ function readGzipFile(
 ): Promise<ArrayBuffer> {
   return new Promise<ArrayBuffer>((resolve, reject) => {
     let isGzip: boolean = false;
-    const inflate: pako.Inflate = new pako.Inflate();
+    const inflate: Inflate = new Inflate();
     const chunks: ArrayBuffer[] = [];
     const chunkSize: number = 1024 * 1000;
     let offset: number = 0;
